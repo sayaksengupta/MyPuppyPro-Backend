@@ -16,7 +16,7 @@ router.post("/register", async (req, res) => {
 
     try { 
       // Check if all the other fields are provided
-      if (!name || !password || !address || !country || !city || !email || !phone) {
+      if (!name || !password || !address || !country || !city || !email || !phone || !type) {
         return res.status(400).json({ error: 'Please provide all the required fields' });
       }
       
