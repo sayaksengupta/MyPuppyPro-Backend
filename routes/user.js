@@ -12,7 +12,7 @@ router.get("/", (req, res) => {
 });
   
 router.post("/register", async (req, res) => {
-    const { name, email, phone, password, address, country, city, type } = req.body;
+    const { name, email, phone, password, address, country, city, type, state, pincode } = req.body;
 
     try { 
       // Check if all the other fields are provided
@@ -31,6 +31,8 @@ router.post("/register", async (req, res) => {
         address,
         country,
         city,
+        state,
+        pincode,
         type
       });
   
@@ -61,6 +63,8 @@ router.post("/register", async (req, res) => {
         address : registered.address,
         country : registered.country,
         city : registered.city,
+        state : registered.state,
+        pincode : registered.pincode,
         type : registered.type
         }
       });
@@ -90,7 +94,7 @@ router.post("/login", async (req, res) => {
     if (passCheck) {
 
       const otp = Math.floor(100000 + Math.random() * 900000);
-      
+
       const OtpStored = await User.findByIdAndUpdate(userByEmail._id, {otp : otp});
 
       var timer = new Stopwatch(300000); 
@@ -114,6 +118,9 @@ router.post("/login", async (req, res) => {
           address : userByEmail.address,
           country : userByEmail.country,
           city : userByEmail.city,
+          state : userByEmail.state,
+          pincode : userByEmail.pincode,
+          type : userByEmail.type
         }
       });
     } else {
@@ -169,6 +176,8 @@ router.patch("/update-user", userAuth, async (req, res) => {
           address: user.address,
           country: user.country,
           city: user.city,
+          state : user.state,
+          pincode : user.pincode,
           type: user.type
         },
       });
@@ -222,6 +231,8 @@ router.post('/otp-verification', async (req,res) => {
         address : UserFound.address,
         country : UserFound.country,
         city : UserFound.city,
+        state : UserFound.state,
+        pincode : UserFound.pincode,
         type : UserFound.type,
       },
       token : token

@@ -25,13 +25,18 @@ const userSchema = new mongoose.Schema({
       required: true,
       trim: true,
     },
-    address : String,
+    address : {
+      line1 : String,
+      line2 : String
+    },
     phone : {
       type: String,
       unique: true
     },
     country: String,
     city: String,
+    state: String,
+    pincode: String,
     otp:{
       type : Number
     },
