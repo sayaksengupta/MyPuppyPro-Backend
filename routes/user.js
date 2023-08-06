@@ -450,8 +450,8 @@ router.put("/edit-dog/:id", userAuth, async (req, res) => {
     if (name) updatedDog.name = name;
     if (image) updatedDog.image = image;
 
-    await Dog.findByIdAndUpdate(id, updatedDog);
-    return res.status(200).json({ message: "Dog updated successfully", newDog: updatedDog, success: true, });
+    const UpdatedDoggo =  await Dog.findByIdAndUpdate(id, updatedDog);
+    return res.status(200).json({ message: "Dog updated successfully", newDog: UpdatedDoggo, success: true, });
   } catch (error) {
     console.error("Error editing a dog:", error);
     return res.status(500).json({
