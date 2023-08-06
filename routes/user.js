@@ -327,7 +327,7 @@ router.get("/get-user", userAuth, async (req, res) => {
 router.post("/add-dog", userAuth, async (req, res) => {
   try {
     const user_id = req.rootUser._id;
-    console.log(req.body)
+    console.log(req.body);
     const {
       breed_id,
       generic_name,
@@ -346,7 +346,8 @@ router.post("/add-dog", userAuth, async (req, res) => {
       !generic_name ||
       !age ||
       !gender ||
-      disability == undefined || disability == null || 
+      disability == undefined ||
+      disability == null ||
       !address ||
       !price ||
       !name ||
@@ -423,7 +424,7 @@ router.put("/edit-dog/:id", userAuth, async (req, res) => {
       !generic_name &&
       !age &&
       !gender &&
-      (disability == undefined || disability == null) && 
+      (disability == undefined || disability == null) &&
       !address &&
       !price &&
       !name &&
@@ -431,7 +432,10 @@ router.put("/edit-dog/:id", userAuth, async (req, res) => {
     ) {
       return res
         .status(400)
-        .json({ message: "Please fill anyone of the fields !", success: false });
+        .json({
+          message: "Please fill anyone of the fields !",
+          success: false,
+        });
     }
 
     // Check if the user exists
@@ -442,12 +446,14 @@ router.put("/edit-dog/:id", userAuth, async (req, res) => {
         .json({ message: "User not found", success: false });
     }
 
-    // Check if the breed exists
-    const breed = await Breed.findOne({ _id: breed_id, active: true });
-    if (!breed) {
-      return res
-        .status(404)
-        .json({ message: "Breed not found", success: false });
+    if (breed_id) {
+      // Check if the breed exists
+      const breed = await Breed.findOne({ _id: breed_id, active: true });
+      if (!breed) {
+        return res
+          .status(404)
+          .json({ message: "Breed not found", success: false });
+      }
     }
 
     const updatedDog = {
