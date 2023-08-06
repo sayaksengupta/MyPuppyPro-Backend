@@ -419,19 +419,19 @@ router.put("/edit-dog/:id", userAuth, async (req, res) => {
     } = req.body;
 
     if (
-      !breed_id ||
-      !generic_name ||
-      !age ||
-      !gender ||
-      disability == undefined || disability == null || 
-      !address ||
-      !price ||
-      !name ||
+      !breed_id &&
+      !generic_name &&
+      !age &&
+      !gender &&
+      (disability == undefined || disability == null) && 
+      !address &&
+      !price &&
+      !name &&
       !image
     ) {
       return res
         .status(400)
-        .json({ message: "Please fill all the fields !", success: false });
+        .json({ message: "Please fill anyone of the fields !", success: false });
     }
 
     // Check if the user exists
