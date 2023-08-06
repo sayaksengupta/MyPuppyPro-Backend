@@ -4,6 +4,8 @@ const Admin = require('../models/admins');
 const bcrypt = require("bcrypt");
 const adminAuth = require("../middleware/adminAuth");
 const User = require('../models/users');
+const Category = require("../models/categories");
+const Breed = require("../models/breeds");
 
 
 
@@ -262,9 +264,10 @@ router.get("/logout", adminAuth, async (req, res) => {
     }
   });
 
-  router.get('/get-all-users', adminAuth, async (req, res) => {
+  router.get('/get-all-users/:type', adminAuth, async (req, res) => {
     try {
-      const users = await User.find();
+      const {type} = req.params;
+      const users = await User.find({type: type});
       res.status(200).json(users);
     } catch (error) {
       res.status(500).json({ message: `Server Error --> ${error}`, success: false });
@@ -315,6 +318,42 @@ router.patch('/change-user-status/:id', async (req, res) => {
       await user.save();
   
       res.status(200).json({ message: 'User status toggled successfully', active: user.active, success:true });
+    } catch (error) {
+      res.status(500).json({ message: `Internal server error --> ${error}`, success:false });
+    }
+  });
+
+  router.patch('/change-category-status/:id', async (req, res) => {
+    const { id } = req.params;
+  
+    try {
+      const category = await Category.findById(id);
+      if (!category) {
+        return res.status(404).json({ message: 'Category not found', success: false });
+      }
+  
+      category.active = !category.active; // Toggle the status
+      await category.save();
+  
+      res.status(200).json({ message: 'Category status toggled successfully', active: category.active, success:true });
+    } catch (error) {
+      res.status(500).json({ message: `Internal server error --> ${error}`, success:false });
+    }
+  });
+
+  router.patch('/change-breed-status/:id', async (req, res) => {
+    const { id } = req.params;
+  
+    try {
+      const breed = await Breed.findById(id);
+      if (!breed) {
+        return res.status(404).json({ message: 'Breed not found', success: false });
+      }
+  
+      breed.active = !breed.active; // Toggle the status
+      await breed.save();
+  
+      res.status(200).json({ message: 'Breed status toggled successfully', active: breed.active, success:true });
     } catch (error) {
       res.status(500).json({ message: `Internal server error --> ${error}`, success:false });
     }
