@@ -15,5 +15,5 @@ const breedSchema = new mongoose.Schema({
   image: String
 });
 
-const Breed = mongoose.model("BREEDS", breedSchema);
+const Breed = mongoose.model("Breed", breedSchema);
 module.exports = Breed;
