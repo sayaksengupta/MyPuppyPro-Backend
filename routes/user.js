@@ -324,6 +324,29 @@ router.get("/get-user", userAuth, async (req, res) => {
   }
 });
 
+router.get("/get-user-dogs", userAuth, async (req, res) => {
+  try {
+    const user_id = req.rootUser._id;
+
+    // Find dogs associated with the user and populate the 'breed' field
+    const userDogs = await Dog.find({ user: user_id }).select({
+      _id: 0,
+      active: 0,
+      user: 0,
+    }); // Populate the 'breed' field with 'name' attribute from Breed model
+
+    return res
+      .status(200)
+      .json({ message: "User Dogs fetched", success: true, userDogs });
+  } catch (error) {
+    console.error("Error fetching user dogs:", error);
+    return res.status(500).json({
+      message: `An error occurred while fetching user dogs --> ${error}`,
+      success: false,
+    });
+  }
+});
+
 router.post("/add-dog", userAuth, async (req, res) => {
   try {
     const user_id = req.rootUser._id;
@@ -422,7 +445,9 @@ router.put("/edit-dog/:id", userAuth, async (req, res) => {
     // Check if the user exists
     const user = await User.findById(user_id);
     if (!user) {
-      return res.status(404).json({ message: "User not found", success: false });
+      return res
+        .status(404)
+        .json({ message: "User not found", success: false });
     }
 
     // Check if the dog exists
@@ -436,22 +461,33 @@ router.put("/edit-dog/:id", userAuth, async (req, res) => {
     if (breed_id) {
       const breed = await Breed.findOne({ _id: breed_id, active: true });
       if (!breed) {
-        return res.status(404).json({ message: "Breed not found", success: false });
+        return res
+          .status(404)
+          .json({ message: "Breed not found", success: false });
       }
       updatedDog.breed = breed_id;
     }
     if (generic_name) updatedDog.generic_name = generic_name;
     if (age) updatedDog.age = age;
     if (gender) updatedDog.gender = gender.toLowerCase();
-    if (disability != undefined && disability != null) updatedDog.disability = disability;
+    if (disability != undefined && disability != null)
+      updatedDog.disability = disability;
     if (address) updatedDog.address = address;
     if (comments) updatedDog.comments = comments;
     if (price) updatedDog.price = price;
     if (name) updatedDog.name = name;
     if (image) updatedDog.image = image;
 
-    const UpdatedDoggo =  await Dog.findByIdAndUpdate(id, updatedDog,{new : true});
-    return res.status(200).json({ message: "Dog updated successfully", newDog: UpdatedDoggo, success: true, });
+    const UpdatedDoggo = await Dog.findByIdAndUpdate(id, updatedDog, {
+      new: true,
+    });
+    return res
+      .status(200)
+      .json({
+        message: "Dog updated successfully",
+        newDog: UpdatedDoggo,
+        success: true,
+      });
   } catch (error) {
     console.error("Error editing a dog:", error);
     return res.status(500).json({
