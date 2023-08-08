@@ -330,7 +330,6 @@ router.get("/get-user-dogs", userAuth, async (req, res) => {
 
     // Find dogs associated with the user and populate the 'breed' field
     const userDogs = await Dog.find({ user: user_id }).select({
-      _id: 0,
       active: 0,
       user: 0,
     }); // Populate the 'breed' field with 'name' attribute from Breed model
