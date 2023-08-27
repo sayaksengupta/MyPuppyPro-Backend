@@ -19,6 +19,32 @@ const dogSchema = new mongoose.Schema({
   address: String,
   comments: String,
   price: Number,
+  pedigree: {
+    father: {
+      breed: mongoose.Schema.Types.ObjectId,
+      DOB: Date,
+      weight: Number,
+      image: String,
+    },
+    mother: {
+      breed: mongoose.Schema.Types.ObjectId,
+      DOB: Date,
+      weight: Number,
+      image: String,
+    },
+    grandfather: {
+      breed: mongoose.Schema.Types.ObjectId,
+      DOB: Date,
+      weight: Number,
+      image: String,
+    },
+    grandmother: {
+      breed: mongoose.Schema.Types.ObjectId,
+      DOB: Date,
+      weight: Number,
+      image: String,
+    },
+  },
   name: {
     type: String,
     trim: true,

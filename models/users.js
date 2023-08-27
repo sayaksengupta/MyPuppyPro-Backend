@@ -40,6 +40,10 @@ const userSchema = new mongoose.Schema({
     otp:{
       type : Number
     },
+    liked_dogs: [{
+      type: mongoose.Types.ObjectId,
+      ref: "DOGS"
+    }],
     active: {
       type: Boolean,
       default: false,

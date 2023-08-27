@@ -346,6 +346,83 @@ router.get("/get-user-dogs", userAuth, async (req, res) => {
   }
 });
 
+router.post("/toggle-like-dog", userAuth, async (req, res) => {
+  try {
+    const user_id = req.rootUser._id;
+    const { dogId } = req.body;
+
+    // Find the user and the dog by their IDs
+    const user = await User.findById(user_id);
+    const dog = await Dog.findById(dogId);
+
+    if (!user || !dog) {
+      return res.status(404).json({
+        message: "User or Dog not found.",
+        success: false,
+      });
+    }
+
+    // Check if the dog is already liked by the user
+    const isLiked = user.liked_dogs.includes(dogId);
+
+    if (isLiked) {
+      // Remove the dog from liked_dogs array
+      user.liked_dogs.pull(dogId);
+    } else {
+      // Add the dog to liked_dogs array
+      user.liked_dogs.push(dogId);
+    }
+
+    await user.save();
+
+    return res.status(200).json({
+      message: "Dog liked status toggled.",
+      success: true,
+      isLiked: !isLiked, // Return the updated liked status
+    });
+  } catch (error) {
+    console.error("Error toggling liked dog:", error);
+    return res.status(500).json({
+      message: `An error occurred while toggling liked dog --> ${error}`,
+      success: false,
+    });
+  }
+});
+
+router.get("/get-liked-dogs", userAuth, async (req, res) => {
+  try {
+    const user_id = req.rootUser._id;
+
+    // Find liked dogs associated with the user and populate the 'breed' field
+    const likedDogs = await User.findById(user_id)
+      .populate({
+        path: "liked_dogs",
+        populate: {
+          path: "breed",
+          model: "Breed", // Replace with the name of your Breed model
+          select: "name", // Assuming you want to only populate the 'name' field
+        },
+        select: {
+          active: 0,
+          user: 0,
+        },
+      })
+      .select("liked_dogs"); // Select only the 'liked_dogs' field
+
+    return res.status(200).json({
+      message: "Liked Dogs fetched",
+      success: true,
+      likedDogs: likedDogs.liked_dogs,
+    });
+  } catch (error) {
+    console.error("Error fetching liked dogs:", error);
+    return res.status(500).json({
+      message: `An error occurred while fetching liked dogs --> ${error}`,
+      success: false,
+    });
+  }
+});
+
 router.post("/add-dog", userAuth, async (req, res) => {
   try {
     const user_id = req.rootUser._id;
@@ -424,6 +501,101 @@ router.post("/add-dog", userAuth, async (req, res) => {
   }
 });
 
+router.post("/add-pedigree/:dogId", userAuth, async (req, res) => {
+  try {
+    const user_id = req.rootUser._id;
+    const { dogId } = req.params;
+    const { pedigreeDetails } = req.body;
+
+    const allowedPedigreeFields = [
+      "father",
+      "mother",
+      "grandfather",
+      "grandmother",
+    ];
+
+    // Find the user and the dog by their IDs
+    const user = await User.findById(user_id);
+    const dog = await Dog.findById(dogId);
+
+    if (!user || !dog) {
+      return res.status(404).json({
+        message: "User or Dog not found.",
+        success: false,
+      });
+    }
+
+    // Check if the user is a "breeder"
+    if (user.type !== "breeder") {
+      return res.status(403).json({
+        message: "Only breeders can add pedigree details.",
+        success: false,
+      });
+    }
+
+    // Check if the dog belongs to the user
+    if (dog.user.toString() !== user_id.toString()) {
+      return res.status(403).json({
+        message: "You are not the owner of this dog.",
+        success: false,
+      });
+    }
+
+    // Validate and update the pedigree details of the dog
+    const updatedPedigree = {};
+    for (const field of allowedPedigreeFields) {
+      if (pedigreeDetails[field]) {
+        updatedPedigree[field] = pedigreeDetails[field];
+      }
+    }
+
+    dog.pedigree = updatedPedigree;
+    await dog.save();
+
+    return res.status(200).json({
+      message: "Pedigree details added to the dog.",
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error adding pedigree details:", error);
+    return res.status(500).json({
+      message: `An error occurred while adding pedigree details --> ${error}`,
+      success: false,
+    });
+  }
+});
+
+router.get("/get-pedigree/:dogId", async (req, res) => {
+  try {
+    const { dogId } = req.params;
+
+    // Find the dog by its ID
+    const dog = await Dog.findById(dogId);
+
+    if (!dog) {
+      return res.status(404).json({
+        message: "Dog not found.",
+        success: false,
+      });
+    }
+
+    // Retrieve the pedigree details from the dog's document
+    const pedigreeDetails = dog.pedigree;
+
+    return res.status(200).json({
+      message: "Pedigree details fetched.",
+      success: true,
+      pedigreeDetails,
+    });
+  } catch (error) {
+    console.error("Error fetching pedigree details:", error);
+    return res.status(500).json({
+      message: `An error occurred while fetching pedigree details --> ${error}`,
+      success: false,
+    });
+  }
+});
+
 router.put("/edit-dog/:id", userAuth, async (req, res) => {
   try {
     const { id } = req.params;
@@ -480,13 +652,11 @@ router.put("/edit-dog/:id", userAuth, async (req, res) => {
     const UpdatedDoggo = await Dog.findByIdAndUpdate(id, updatedDog, {
       new: true,
     });
-    return res
-      .status(200)
-      .json({
-        message: "Dog updated successfully",
-        newDog: UpdatedDoggo,
-        success: true,
-      });
+    return res.status(200).json({
+      message: "Dog updated successfully",
+      newDog: UpdatedDoggo,
+      success: true,
+    });
   } catch (error) {
     console.error("Error editing a dog:", error);
     return res.status(500).json({
