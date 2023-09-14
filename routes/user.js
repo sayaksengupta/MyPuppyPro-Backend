@@ -7,6 +7,8 @@ const adminAuth = require("../middleware/adminAuth");
 var Stopwatch = require("timer-stopwatch");
 const Breed = require("../models/breeds");
 const Dog = require("../models/dogs");
+const Order = require("../models/orders");
+const { default: mongoose } = require("mongoose");
 
 router.get("/", (req, res) => {
   res.json({ message: "This is the User api" });
@@ -667,7 +669,7 @@ router.put("/edit-dog/:id", userAuth, async (req, res) => {
 });
 
 // Endpoint to delete a dog
-router.delete("/delete-dog/:id", async (req, res) => {
+router.delete("/delete-dog/:id", userAuth, async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -685,6 +687,62 @@ router.delete("/delete-dog/:id", async (req, res) => {
       message: "An error occurred while deleting the dog",
       success: false,
     });
+  }
+});
+
+// Route to add a new order
+router.post("/add-order", userAuth, async (req, res) => {
+  try {
+    const { amount } = req.body;
+    let { dog } = req.body;
+
+    const user = req.rootUser._id;
+    dog = new mongoose.Types.ObjectId(dog);
+    // Generate an 8-character order ID
+    const orderId = nanoid(8);
+
+    // Create a new order document
+    const order = new Order({
+      dog,
+      user,
+      amount,
+      orderId,
+      status: 0, // Default status is 0 (processing)
+    });
+
+    // Save the order to the database
+    await order.save();
+
+    res.status(201).json({ message: "Order added successfully", order });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error adding order" });
+  }
+});
+// Route to edit an existing order
+router.put("/edit-order/:orderId", userAuth, async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const updates = req.body;
+
+    // Check if the status is one of the allowed values (0, 1, or 2)
+    if (updates.status !== undefined && ![0, 1, 2].includes(updates.status)) {
+      return res.status(400).json({ message: "Invalid status value" });
+    }
+
+    // Find the order by orderId and update the specified fields
+    const order = await Order.findOneAndUpdate({ orderId }, updates, {
+      new: true,
+    });
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    res.json({ message: "Order updated successfully", order });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error editing order" });
   }
 });
 
