@@ -718,6 +718,7 @@ router.post("/add-order", userAuth, async (req, res) => {
 
     res.status(201).json({
       message: "Order added successfully",
+      success: true,
       order: {
         _id: order._id,
         dog: dogFound,
@@ -741,7 +742,7 @@ router.post("/add-order", userAuth, async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error adding order" });
+    res.status(500).json({ message: "Error adding order", success: false });
   }
 });
 // Route to edit an existing order
@@ -768,10 +769,10 @@ router.put("/edit-order/:orderId", userAuth, async (req, res) => {
       await Dog.findByIdAndUpdate(order.dog._id, { soldStatus: true });
     }
 
-    res.json({ message: "Order updated successfully", order });
+    res.json({ message: "Order updated successfully", success: true, order });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error editing order" });
+    res.status(500).json({ message: "Error editing order", success: false });
   }
 });
 
@@ -782,10 +783,16 @@ router.get("/get-orders", userAuth, async (req, res) => {
     // Find all orders that belong to the specified user
     const orders = await Order.find({ user: userId }).populate("dog");
 
-    res.json(orders);
+    res.status(200).json({
+      message: "User orders fetched successfully",
+      success: true,
+      orders,
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error retrieving orders" });
+    res
+      .status(500)
+      .json({ message: "Error retrieving orders", success: false });
   }
 });
 
