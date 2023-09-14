@@ -694,11 +694,13 @@ router.delete("/delete-dog/:id", userAuth, async (req, res) => {
 // Route to add a new order
 router.post("/add-order", userAuth, async (req, res) => {
   try {
-    const { amount } = req.body;
     let { dog } = req.body;
 
     const user = req.rootUser._id;
     dog = new mongoose.Types.ObjectId(dog);
+
+    const dogFound = await Dog.findById(dog);
+    const amount = parseInt(dogFound.price);
     // Generate an 8-character order ID
     const orderId = shortid.generate();
 

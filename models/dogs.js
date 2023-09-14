@@ -19,6 +19,10 @@ const dogSchema = new mongoose.Schema({
   address: String,
   comments: String,
   price: Number,
+  soldStatus: {
+    type: Boolean,
+    default: false,
+  },
   pedigree: {
     father: {
       breed: mongoose.Schema.Types.ObjectId,
