@@ -9,6 +9,7 @@ const Breed = require("../models/breeds");
 const Dog = require("../models/dogs");
 const Order = require("../models/orders");
 const { default: mongoose } = require("mongoose");
+import { nanoid } from "nanoid";
 
 router.get("/", (req, res) => {
   res.json({ message: "This is the User api" });
@@ -699,7 +700,7 @@ router.post("/add-order", userAuth, async (req, res) => {
     const user = req.rootUser._id;
     dog = new mongoose.Types.ObjectId(dog);
     // Generate an 8-character order ID
-    const orderId = nanoid(8);
+    const orderId = shortid.generate();
 
     // Create a new order document
     const order = new Order({
