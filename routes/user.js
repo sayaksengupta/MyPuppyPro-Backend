@@ -9,7 +9,7 @@ const Breed = require("../models/breeds");
 const Dog = require("../models/dogs");
 const Order = require("../models/orders");
 const { default: mongoose } = require("mongoose");
-import { nanoid } from "nanoid";
+const shortid = require("shortid");
 
 router.get("/", (req, res) => {
   res.json({ message: "This is the User api" });
