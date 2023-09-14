@@ -721,7 +721,17 @@ router.post("/add-order", userAuth, async (req, res) => {
       order: {
         _id: order._id,
         dog: dogFound,
-        user: req.rootUser,
+        user: {
+          _id: user._id,
+          name: user.name,
+          type: user.type,
+          email: user.email,
+          phone: user.phone,
+          country: user.country,
+          city: user.city,
+          state: user.state,
+          pincode: user.pincode,
+        },
         amount: order.amount,
         orderId: order.orderId,
         status: order.status,
