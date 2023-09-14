@@ -716,7 +716,19 @@ router.post("/add-order", userAuth, async (req, res) => {
     // Save the order to the database
     await order.save();
 
-    res.status(201).json({ message: "Order added successfully", order });
+    res.status(201).json({
+      message: "Order added successfully",
+      order: {
+        _id: order._id,
+        dog: dogFound,
+        user: req.rootUser,
+        amount: order.amount,
+        orderId: order.orderId,
+        status: order.status,
+        createdAt: order.createdAt,
+        updatedAt: order.updatedAt,
+      },
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error adding order" });
@@ -740,6 +752,10 @@ router.put("/edit-order/:orderId", userAuth, async (req, res) => {
 
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
+    }
+
+    if (order && order.status === 1) {
+      await Dog.findByIdAndUpdate(order.dog._id, { soldStatus: true });
     }
 
     res.json({ message: "Order updated successfully", order });
