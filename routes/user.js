@@ -765,6 +765,20 @@ router.put("/edit-order/:orderId", userAuth, async (req, res) => {
   }
 });
 
+router.get("/get-orders", userAuth, async (req, res) => {
+  try {
+    const userId = req.rootUser._id;
+
+    // Find all orders that belong to the specified user
+    const orders = await Order.find({ user: userId }).populate("dog");
+
+    res.json(orders);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error retrieving orders" });
+  }
+});
+
 router.get("/logout", userAuth, async (req, res) => {
   try {
     res.status(200).send({ message: "logged out successfully!" });
