@@ -166,6 +166,7 @@ router.post("/login", async (req, res) => {
             pincode: userByEmail.pincode,
             type: userByEmail.type,
           },
+          otp: otp
         });
       } else {
         res
@@ -748,16 +749,26 @@ router.post("/add-order", userAuth, async (req, res) => {
 // Route to edit an existing order
 router.put("/edit-order/:orderId", userAuth, async (req, res) => {
   try {
-    const { orderId } = req.params;
+    let { orderId } = req.params;
     const updates = req.body;
+
+    console.log(orderId);
+
+    orderId = new mongoose.Types.ObjectId(orderId);
+
+    console.log(orderId);
 
     // Check if the status is one of the allowed values (0, 1, or 2)
     if (updates.status !== undefined && ![0, 1, 2].includes(updates.status)) {
       return res.status(400).json({ message: "Invalid status value" });
     }
 
+    const orderFound = await Order.findById(orderId);
+
+    console.log(orderFound);
+
     // Find the order by orderId and update the specified fields
-    const order = await Order.findOneAndUpdate({ orderId }, updates, {
+    const order = await Order.findByIdAndUpdate(orderId, updates, {
       new: true,
     });
 
