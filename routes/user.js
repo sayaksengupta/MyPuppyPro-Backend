@@ -328,6 +328,20 @@ router.get("/get-user", userAuth, async (req, res) => {
   }
 });
 
+router.get("/get-user/:id", userAuth, async (req, res) => {
+  const userId = req.params.id;
+
+  try {
+    const user = await User.findById(userId).select("-password -otp");
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 router.get("/get-user-dogs", userAuth, async (req, res) => {
   try {
     const user_id = req.rootUser._id;
