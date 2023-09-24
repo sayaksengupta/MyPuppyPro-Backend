@@ -107,7 +107,7 @@ router.post("/register", async (req, res) => {
         city: registered.city,
         state: registered.state,
         pincode: registered.pincode,
-        type: registered.type,
+        type: registered.type.toLowerCase(),
       },
     });
   } catch (error) {
@@ -166,7 +166,7 @@ router.post("/login", async (req, res) => {
             pincode: userByEmail.pincode,
             type: userByEmail.type,
           },
-          otp: otp
+          otp: otp,
         });
       } else {
         res
@@ -804,6 +804,204 @@ router.get("/get-orders", userAuth, async (req, res) => {
     res
       .status(500)
       .json({ message: "Error retrieving orders", success: false });
+  }
+});
+
+// Add Review to a Breeder
+router.post("/add-review/:breederId", userAuth, async (req, res) => {
+  try {
+    const userId = req.rootUser._id;
+    const userName = req.rootUser.name;
+    const { review } = req.body;
+    const breederId = req.params.breederId;
+
+    const BreederFound = await User.findById(breederId);
+
+    if (!BreederFound) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // Validate if the provided product ID is a valid ObjectId
+    if (
+      !mongoose.Types.ObjectId.isValid(breederId) ||
+      BreederFound.type.toLowerCase() !== "breeder"
+    ) {
+      return res.status(400).json({ message: "Invalid Breeder ID" });
+    }
+
+    // Validate the review data
+    if (!userId || !userName || !review) {
+      return res
+        .status(400)
+        .json({ message: "All fields are required for a review" });
+    }
+
+    // // Check if the product exists
+    // const breeder = await User.findById(breederId);
+
+    // Create a new review
+    const newReview = {
+      userId,
+      userName,
+      review,
+    };
+
+    // Add the review to the product's reviews array
+    BreederFound.reviews.push(newReview);
+
+    // Save the product with the new review
+    await BreederFound.save();
+
+    res
+      .status(201)
+      .json({ message: "Review added successfully", review: newReview });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
+  }
+});
+
+// Add or Edit Rating for a Breeder
+router.post("/add-rating/:breederId", userAuth, async (req, res) => {
+  try {
+    const userId = req.rootUser._id;
+    const { rating } = req.body;
+    const breederId = req.params.breederId;
+
+    const BreederFound = await User.findById(breederId);
+
+    if (!BreederFound) {
+      return res.status(404).json({ message: "Breeder not found" });
+    }
+
+    // Validate if the provided product ID is a valid ObjectId
+    if (
+      !mongoose.Types.ObjectId.isValid(breederId) ||
+      BreederFound.type.toLowerCase() !== "breeder"
+    ) {
+      return res.status(400).json({ message: "Invalid Breeder ID" });
+    }
+
+    // Validate the rating data
+    if (!userId || !rating || rating < 1 || rating > 5) {
+      return res.status(400).json({ message: "Invalid rating data" });
+    }
+
+    // Check if the user has already rated the product
+    const existingRatingIndex = BreederFound.ratings.findIndex(
+      (r) => r.userId.toString() === userId.toString()
+    );
+
+    if (existingRatingIndex !== -1) {
+      // User has already rated the product, update the existing rating
+      BreederFound.ratings[existingRatingIndex].rating = rating;
+    } else {
+      // User hasn't rated the product, add a new rating
+      BreederFound.ratings.push({
+        userId,
+        rating,
+      });
+    }
+
+    // Calculate the new average rating for the product
+    const totalRatings = BreederFound.ratings.reduce(
+      (sum, r) => sum + r.rating,
+      0
+    );
+    const averageRating = totalRatings / BreederFound.ratings.length;
+
+    // Update the product's average rating
+    BreederFound.averageRating = averageRating;
+
+    // Save the product with the updated rating
+    await BreederFound.save();
+
+    res.status(200).json({
+      message: "Rating added/updated successfully",
+      averageRating: BreederFound.averageRating,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
+  }
+});
+
+// Define the route to filter dogs
+router.get("/filter-dogs", userAuth, async (req, res) => {
+  try {
+    // Parse query parameters
+    const { breedName, userName, generic_name, age, disability, price } =
+      req.query;
+
+    // Fetch the breed and user documents by name
+    const [breed, user] = await Promise.all([
+      Breed.findOne({ name: breedName }),
+      User.findOne({ name: userName }),
+    ]);
+
+    // Build the filter object
+    const filter = {};
+    if (breed) {
+      filter.breed = breed._id;
+    }
+    if (user) {
+      filter.user = user._id;
+    }
+    if (generic_name) {
+      filter.generic_name = generic_name;
+    }
+    if (age) {
+      filter.age = { $gte: age };
+    }
+    if (disability !== undefined) {
+      filter.disability = disability === "true";
+    }
+    if (price) {
+      filter.price = { $lte: price };
+    }
+
+    // Query the database
+    const filteredDogs = await Dog.find(filter);
+
+    // Return the filtered results as JSON
+    res.status(200).json({
+      message: "Dogs fetched successfully!",
+      success: true,
+      filteredDogs,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error", success: false });
+  }
+});
+
+// Define the route to get all dogs with pagination
+router.get("/get-dogs", userAuth, async (req, res) => {
+  try {
+    // Parse query parameters for pagination
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+    // Calculate the skip value to implement pagination
+    const skip = (page - 1) * limit;
+
+    // Query the database to retrieve paginated dogs
+    const totalDogs = await Dog.countDocuments();
+    const totalPages = Math.ceil(totalDogs / limit);
+
+    const dogs = await Dog.find().skip(skip).limit(limit);
+
+    // Return the paginated results along with page information as JSON
+    res.json({
+      currentPage: page,
+      totalPages: totalPages,
+      dogs: dogs,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
