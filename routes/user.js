@@ -38,8 +38,7 @@ router.post("/register", async (req, res) => {
       !address ||
       !country ||
       !city ||
-      !email ||
-      !phone ||
+      (!email && !phone) ||
       !type
     ) {
       return res
