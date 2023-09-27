@@ -69,6 +69,9 @@ const userSchema = new mongoose.Schema({
       ref: "DOGS",
     },
   ],
+  profileImg: {
+    type: String,
+  },
   active: {
     type: Boolean,
     default: false,

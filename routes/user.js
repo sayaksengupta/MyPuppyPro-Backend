@@ -27,6 +27,7 @@ router.post("/register", async (req, res) => {
     type,
     state,
     pincode,
+    profileImg,
   } = req.body;
 
   try {
@@ -74,6 +75,7 @@ router.post("/register", async (req, res) => {
       state,
       pincode,
       type,
+      profileImg,
     });
 
     // Save the user to the database
@@ -107,6 +109,7 @@ router.post("/register", async (req, res) => {
         city: registered.city,
         state: registered.state,
         pincode: registered.pincode,
+        profileImg: registered.profileImg,
         type: registered.type.toLowerCase(),
       },
     });
@@ -164,6 +167,7 @@ router.post("/login", async (req, res) => {
             city: userByEmail.city,
             state: userByEmail.state,
             pincode: userByEmail.pincode,
+            profileImg: userByEmail.profileImg,
             type: userByEmail.type,
           },
           otp: otp,
@@ -197,6 +201,7 @@ router.patch("/update-user", userAuth, async (req, res) => {
     "phone",
     "country",
     "city",
+    "profileImg",
   ];
   const isValidOperation = Object.keys(updates).every((update) =>
     allowedUpdates.includes(update)
@@ -237,6 +242,7 @@ router.patch("/update-user", userAuth, async (req, res) => {
         state: user.state,
         pincode: user.pincode,
         type: user.type,
+        profileImg: user.profileImg,
       },
     });
   } catch (error) {
@@ -293,6 +299,7 @@ router.post("/otp-verification", async (req, res) => {
           state: UserFound.state,
           pincode: UserFound.pincode,
           type: UserFound.type,
+          profileImg: UserFound.profileImg,
         },
         token: token,
       });
