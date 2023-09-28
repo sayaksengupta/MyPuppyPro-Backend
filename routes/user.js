@@ -1051,7 +1051,7 @@ router.get("/filter-dogs", userAuth, async (req, res) => {
 });
 
 // Define the route to get all dogs with pagination
-router.get("/get-dogs", userAuth, async (req, res) => {
+router.get("/get-dogs", async (req, res) => {
   try {
     // Parse query parameters for pagination
     const page = parseInt(req.query.page) || 1;
