@@ -1009,6 +1009,7 @@ router.get("/filter-dogs", async (req, res) => {
       userName,
       generic_name,
       age,
+      gender,
       disability,
       minPrice,
       maxPrice,
@@ -1027,6 +1028,9 @@ router.get("/filter-dogs", async (req, res) => {
     }
     if (user) {
       filter.user = user._id;
+    }
+    if (gender) {
+      filter.gender = gender.toLowerCase();
     }
     if (generic_name) {
       filter.generic_name = generic_name;
