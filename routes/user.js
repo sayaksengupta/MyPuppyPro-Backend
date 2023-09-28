@@ -222,7 +222,6 @@ router.post("/login-web", async (req, res) => {
             profileImg: userByEmail.profileImg,
             type: userByEmail.type,
           },
-          otp: otp,
         });
       } else {
         res
