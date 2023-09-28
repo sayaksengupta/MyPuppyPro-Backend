@@ -1002,7 +1002,7 @@ router.post("/add-rating/:breederId", userAuth, async (req, res) => {
 });
 
 // Define the route to filter dogs
-router.get("/filter-dogs", userAuth, async (req, res) => {
+router.get("/filter-dogs", async (req, res) => {
   try {
     // Parse query parameters
     const { breedName, userName, generic_name, age, disability, price } =
