@@ -188,6 +188,59 @@ router.post("/login", async (req, res) => {
   }
 });
 
+router.post("/login-web", async (req, res) => {
+  try {
+    const logEmail = req.body.email;
+    const logPass = req.body.password;
+
+    if (!logEmail || !logPass) {
+      return res
+        .status(422)
+        .json({ message: "Please fill all the fields.", success: false });
+    }
+
+    const userByEmail = await User.findOne({ email: logEmail });
+
+    if (userByEmail) {
+      const passCheck = await bcrypt.compare(logPass, userByEmail.password);
+      const token = await userByEmail.generateAuthToken();
+
+      if (passCheck) {
+        res.status(200).json({
+          success: true,
+          token: token,
+          user: {
+            _id: userByEmail._id,
+            name: userByEmail.name,
+            email: userByEmail.email,
+            phone: userByEmail.phone,
+            address: userByEmail.address,
+            country: userByEmail.country,
+            city: userByEmail.city,
+            state: userByEmail.state,
+            pincode: userByEmail.pincode,
+            profileImg: userByEmail.profileImg,
+            type: userByEmail.type,
+          },
+          otp: otp,
+        });
+      } else {
+        res
+          .status(400)
+          .json({ message: "Invalid login credentials", success: false });
+      }
+    } else {
+      res
+        .status(400)
+        .json({ message: "Invalid login credentials", success: false });
+    }
+  } catch (message) {
+    res
+      .status(500)
+      .json({ message: `Server Error --> ${message}`, success: false });
+  }
+});
+
 router.patch("/update-user", userAuth, async (req, res) => {
   const userId = req.rootUser._id;
   const updates = req.body;
