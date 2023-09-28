@@ -1001,12 +1001,18 @@ router.post("/add-rating/:breederId", userAuth, async (req, res) => {
   }
 });
 
-// Define the route to filter dogs
 router.get("/filter-dogs", async (req, res) => {
   try {
     // Parse query parameters
-    const { breedName, userName, generic_name, age, disability, price } =
-      req.query;
+    const {
+      breedName,
+      userName,
+      generic_name,
+      age,
+      disability,
+      minPrice,
+      maxPrice,
+    } = req.query;
 
     // Fetch the breed and user documents by name
     const [breed, user] = await Promise.all([
@@ -1031,8 +1037,12 @@ router.get("/filter-dogs", async (req, res) => {
     if (disability !== undefined) {
       filter.disability = disability === "true";
     }
-    if (price) {
-      filter.price = { $lte: price };
+    if (minPrice && maxPrice) {
+      filter.price = { $gte: minPrice, $lte: maxPrice };
+    } else if (minPrice) {
+      filter.price = { $gte: minPrice };
+    } else if (maxPrice) {
+      filter.price = { $lte: maxPrice };
     }
 
     // Query the database
