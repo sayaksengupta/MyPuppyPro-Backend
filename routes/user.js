@@ -45,7 +45,7 @@ router.post("/register", async (req, res) => {
         .status(400)
         .json({ error: "Please provide all the required fields" });
     }
-
+    
     const UserFound = await User.findOne({
       $or: [
         { email: email },
