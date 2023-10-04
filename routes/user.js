@@ -45,7 +45,7 @@ router.post("/register", async (req, res) => {
         .status(400)
         .json({ error: "Please provide all the required fields" });
     }
-    
+
     const UserFound = await User.findOne({
       $or: [
         { email: email },
@@ -1088,6 +1088,65 @@ router.get("/get-dogs", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// POST route to add preferences to a user's profile
+router.post("/add-preferences", userAuth, async (req, res) => {
+  const preferencesToAdd = req.body.preferences; // Array of preferences
+
+  try {
+    const user = req.rootUser;
+
+    // Check if preferencesToAdd is an array
+    if (!Array.isArray(preferencesToAdd)) {
+      return res
+        .status(400)
+        .json({ message: "Preferences should be an array" });
+    }
+
+    // Check if the preferencesToAdd array is not empty
+    if (preferencesToAdd.length === 0) {
+      return res.status(400).json({ message: "Preferences array is empty" });
+    }
+
+    const newPreferences = [];
+
+    for (const preferenceData of preferencesToAdd) {
+      const { name, breedId, image } = preferenceData;
+
+      // Check if the breed exists
+      const breed = await Breed.findById(breedId);
+
+      if (!breed) {
+        return res
+          .status(404)
+          .json({ message: `Breed not found for preference: ${name}` });
+      }
+
+      // Create a new preference object
+      const preference = {
+        name,
+        breed: breed._id, // Assign the breed ObjectId
+        image,
+      };
+
+      newPreferences.push(preference);
+    }
+
+    // Push the new preferences to the user's preferences array
+    user.preferences.push(...newPreferences);
+
+    // Save the updated user document
+    await user.save();
+
+    return res.status(201).json({
+      message: "Preferences added successfully",
+      preferences: user.preferences,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 });
 
