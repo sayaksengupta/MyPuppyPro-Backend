@@ -18,8 +18,6 @@ router.get("/", (req, res) => {
 router.post("/register", async (req, res) => {
   const {
     name,
-    email,
-    phone,
     password,
     address,
     country,
@@ -29,6 +27,8 @@ router.post("/register", async (req, res) => {
     pincode,
     profileImg,
   } = req.body;
+
+  let { email, phone } = req.body;
 
   try {
     // Check if all the other fields are provided
@@ -67,7 +67,7 @@ router.post("/register", async (req, res) => {
     } else if (!phone) {
       phone = null;
     }
-    
+
     // Create a new user
     const user = new User({
       name,
