@@ -62,6 +62,12 @@ router.post("/register", async (req, res) => {
 
     const otp = Math.floor(100000 + Math.random() * 900000);
 
+    if (!email) {
+      email = null;
+    } else if (!phone) {
+      phone = null;
+    }
+    
     // Create a new user
     const user = new User({
       name,
