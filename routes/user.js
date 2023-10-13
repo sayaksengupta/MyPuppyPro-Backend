@@ -125,6 +125,117 @@ router.post("/register", async (req, res) => {
   }
 });
 
+router.post("/register-web", async (req, res) => {
+  const {
+    name,
+    password,
+    address,
+    country,
+    city,
+    type,
+    state,
+    pincode,
+    profileImg,
+  } = req.body;
+
+  let { email, phone } = req.body;
+
+  try {
+    // Check if all the other fields are provided
+    if (
+      !name ||
+      !password ||
+      !address ||
+      !country ||
+      !city ||
+      (!email && !phone) ||
+      !type
+    ) {
+      return res
+        .status(400)
+        .json({ error: "Please provide all the required fields" });
+    }
+
+    const UserFound = await User.findOne({
+      $or: [
+        { email: email },
+        { phone: phone }, // Replace 'phoneNumber' with the actual phone number you want to search for
+      ],
+    });
+
+    if (UserFound) {
+      return res.status(422).json({
+        message: "User already exists",
+        status: false,
+      });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000);
+
+    if (!email) {
+      email = null;
+    } else if (!phone) {
+      phone = null;
+    }
+
+    // Create a new user
+    const user = new User({
+      name,
+      email,
+      phone,
+      password,
+      address,
+      country,
+      city,
+      state,
+      pincode,
+      type,
+      profileImg,
+    });
+
+    // Save the user to the database
+    const registered = await user.save();
+
+    const OtpStored = await User.findByIdAndUpdate(registered._id, {
+      otp: otp,
+    });
+
+    var timer = new Stopwatch(300000);
+
+    if (registered && OtpStored) {
+      timer.start();
+      timer.onDone(async function () {
+        await User.findOneAndUpdate({ otp }, { otp: "" });
+      });
+    }
+
+    const token = await registered.generateAuthToken();
+
+    res.status(201).json({
+      message: "User registered successfully!",
+      token: token,
+      success: true,
+      user: {
+        _id: registered._id,
+        name: registered.name,
+        email: registered.email,
+        phone: registered.phone,
+        address: registered.address,
+        country: registered.country,
+        city: registered.city,
+        state: registered.state,
+        pincode: registered.pincode,
+        profileImg: registered.profileImg,
+        type: registered.type.toLowerCase(),
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: `An error occurred while registering the user --> ${error}`,
+    });
+  }
+});
+
 router.post("/login", async (req, res) => {
   try {
     const logEmail = req.body.email;
@@ -1068,6 +1179,56 @@ router.get("/filter-dogs", async (req, res) => {
     res.status(500).json({ message: "Internal server error", success: false });
   }
 });
+
+router.get("/find-dogs", async (req, res) => {
+  try {
+    // Parse query parameters
+    const {
+      breedName,
+      age,
+      gender,
+      minPrice,
+      maxPrice,
+    } = req.query;
+
+    // Build the filter object
+    const filter = {};
+
+    if (breedName) {
+      filter.breedName = { $in: Array.isArray(breedName) ? breedName : [breedName] };
+    }
+
+    if (gender) {
+      filter.gender = { $in: Array.isArray(gender) ? gender : [gender] };
+    }
+
+    if (age) {
+      filter.age = { $in: Array.isArray(age) ? age : [age] };
+    }
+
+    if (minPrice && maxPrice) {
+      filter.price = { $gte: minPrice, $lte: maxPrice };
+    } else if (minPrice) {
+      filter.price = { $gte: minPrice };
+    } else if (maxPrice) {
+      filter.price = { $lte: maxPrice };
+    }
+
+    // Query the database based on the filter criteria
+    const filteredDogs = await Dog.find(filter);
+
+    // Return the filtered results as JSON
+    res.status(200).json({
+      message: "Dogs fetched successfully!",
+      success: true,
+      filteredDogs,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error", success: false });
+  }
+});
+
 
 // Define the route to get all dogs with pagination
 router.get("/get-dogs", async (req, res) => {
