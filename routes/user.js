@@ -1183,23 +1183,29 @@ router.get("/filter-dogs", async (req, res) => {
 router.get("/find-dogs", async (req, res) => {
   try {
     // Parse query parameters
-    const {
-      breedName,
-      age,
-      gender,
-      minPrice,
-      maxPrice,
-    } = req.query;
+    const { breedName, age, gender, minPrice, maxPrice } = req.query;
 
     // Build the filter object
     const filter = {};
 
     if (breedName) {
-      filter.breedName = { $in: Array.isArray(breedName) ? breedName : [breedName] };
+      const breedIds = await Promise.all(
+        (Array.isArray(breedName) ? breedName : [breedName]).map(
+          async (name) => {
+            const breed = await Breed.findOne({ name });
+            return breed ? breed._id : null;
+          }
+        )
+      );
+      filter.breed = { $in: breedIds.filter((id) => id) };
     }
 
     if (gender) {
-      filter.gender = { $in: Array.isArray(gender) ? gender : [gender] };
+      filter.gender = {
+        $in: Array.isArray(gender)
+          ? gender.map((g) => g.toLowerCase())
+          : [gender.toLowerCase()],
+      };
     }
 
     if (age) {
@@ -1228,7 +1234,6 @@ router.get("/find-dogs", async (req, res) => {
     res.status(500).json({ message: "Internal server error", success: false });
   }
 });
-
 
 // Define the route to get all dogs with pagination
 router.get("/get-dogs", async (req, res) => {
