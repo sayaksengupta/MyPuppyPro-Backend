@@ -196,19 +196,6 @@ router.post("/register-web", async (req, res) => {
     // Save the user to the database
     const registered = await user.save();
 
-    const OtpStored = await User.findByIdAndUpdate(registered._id, {
-      otp: otp,
-    });
-
-    var timer = new Stopwatch(300000);
-
-    if (registered && OtpStored) {
-      timer.start();
-      timer.onDone(async function () {
-        await User.findOneAndUpdate({ otp }, { otp: "" });
-      });
-    }
-
     const token = await registered.generateAuthToken();
 
     res.status(201).json({
