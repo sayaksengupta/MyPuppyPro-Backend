@@ -1187,10 +1187,6 @@ router.get("/find-dogs", async (req, res) => {
       filter.age = { $in: Array.isArray(age) ? age : [age] };
     }
 
-    if (ca) {
-      filter.age = { $in: Array.isArray(age) ? age : [age] };
-    }
-
     if (minPrice && maxPrice) {
       filter.price = { $gte: minPrice, $lte: maxPrice };
     } else if (minPrice) {

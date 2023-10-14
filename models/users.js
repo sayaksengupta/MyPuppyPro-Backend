@@ -64,15 +64,18 @@ const userSchema = new mongoose.Schema({
   profileImg: {
     type: String,
   },
+  coverImg: {
+    type: String,
+  },
   preferences: [
     {
       name: String,
       breed: {
-       type: mongoose.Types.ObjectId,
+        type: mongoose.Types.ObjectId,
         ref: "Breed",
       },
-      image: String
-    }
+      image: String,
+    },
   ],
   active: {
     type: Boolean,
