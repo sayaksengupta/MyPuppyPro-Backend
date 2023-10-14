@@ -25,7 +25,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    unique: true,
     validate(value) {
       if (!validator.isEmail(value)) {
         throw new Error("Invalid Email.");
@@ -43,7 +42,6 @@ const userSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
-    unique: true,
   },
   country: String,
   city: String,
