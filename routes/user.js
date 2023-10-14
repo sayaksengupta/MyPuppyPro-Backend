@@ -283,36 +283,39 @@ router.post("/login", async (req, res) => {
 router.post("/login-web", async (req, res) => {
   try {
     const logEmail = req.body.email;
+    const logPhone = req.body.phone;
     const logPass = req.body.password;
 
-    if (!logEmail || !logPass) {
+    if ((!logEmail && !logPhone) || !logPass) {
       return res
         .status(422)
         .json({ message: "Please fill all the fields.", success: false });
     }
 
-    const userByEmail = await User.findOne({ email: logEmail });
+    const user = await User.findOne({
+      $or: [{ email: logEmail }, { phone: logPhone }],
+    });
 
-    if (userByEmail) {
-      const passCheck = await bcrypt.compare(logPass, userByEmail.password);
-      const token = await userByEmail.generateAuthToken();
+    if (user) {
+      const passCheck = await bcrypt.compare(logPass, user.password);
+      const token = await user.generateAuthToken();
 
       if (passCheck) {
         res.status(200).json({
           success: true,
           token: token,
           user: {
-            _id: userByEmail._id,
-            name: userByEmail.name,
-            email: userByEmail.email,
-            phone: userByEmail.phone,
-            address: userByEmail.address,
-            country: userByEmail.country,
-            city: userByEmail.city,
-            state: userByEmail.state,
-            pincode: userByEmail.pincode,
-            profileImg: userByEmail.profileImg,
-            type: userByEmail.type,
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            phone: user.phone,
+            address: user.address,
+            country: user.country,
+            city: user.city,
+            state: user.state,
+            pincode: user.pincode,
+            profileImg: user.profileImg,
+            type: user.type,
           },
         });
       } else {
