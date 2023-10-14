@@ -1161,7 +1161,8 @@ router.get("/filter-dogs", async (req, res) => {
 router.get("/find-dogs", async (req, res) => {
   try {
     // Parse query parameters
-    const { breedName, age, gender, minPrice, maxPrice } = req.query;
+    const { breedName, age, gender, minPrice, maxPrice, page, limit } =
+      req.query;
 
     // Build the filter object
     const filter = {};
@@ -1198,13 +1199,20 @@ router.get("/find-dogs", async (req, res) => {
       filter.price = { $lte: maxPrice };
     }
 
-    // Query the database based on the filter criteria
-    const filteredDogs = await Dog.find(filter);
+    // Calculate the skip value to implement pagination
+    const skip = (page - 1) * limit;
 
-    // Return the filtered results as JSON
+    // Query the database based on the filter criteria with pagination
+    const filteredDogs = await Dog.find(filter).skip(skip).limit(limit);
+    const totalFilteredDogs = await Dog.find(filter).countDocuments();
+    const totalPages = Math.ceil(totalFilteredDogs / limit);
+
+    // Return the paginated results along with page information as JSON
     res.status(200).json({
       message: "Dogs fetched successfully!",
       success: true,
+      currentPage: page,
+      totalPages: totalPages,
       filteredDogs,
     });
   } catch (error) {
