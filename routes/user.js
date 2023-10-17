@@ -45,13 +45,18 @@ router.post("/register", async (req, res) => {
         .status(400)
         .json({ error: "Please provide all the required fields" });
     }
+    let UserFound;
+    if (email) {
+      UserFound = await User.findOne({
+        email: email,
+      });
+    }
 
-    const UserFound = await User.findOne({
-      $or: [
-        { email: email },
-        { phone: phone }, // Replace 'phoneNumber' with the actual phone number you want to search for
-      ],
-    });
+    if (phone) {
+      UserFound = await User.findOne({
+        phone: phone,
+      });
+    }
 
     if (UserFound) {
       return res.status(422).json({
