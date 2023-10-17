@@ -43,7 +43,7 @@ router.post("/register", async (req, res) => {
     ) {
       return res
         .status(400)
-        .json({ error: "Please provide all the required fields" });
+        .json({ message: "Please provide all the required fields", success: false });
     }
     let UserFound;
 
@@ -155,7 +155,7 @@ router.post("/register-web", async (req, res) => {
     ) {
       return res
         .status(400)
-        .json({ error: "Please provide all the required fields" });
+        .json({ message: "Please provide all the required fields" });
     }
 
     let UserFound;
@@ -371,7 +371,7 @@ router.patch("/update-user", userAuth, async (req, res) => {
   );
 
   if (!isValidOperation) {
-    return res.status(400).json({ error: "Invalid update operation." });
+    return res.status(400).json({ message: "Invalid update operation." });
   }
 
   try {
@@ -423,12 +423,12 @@ router.delete("/delete-user", adminAuth, async (req, res) => {
     const deletedUser = await User.findByIdAndDelete(userId);
 
     if (!deletedUser) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(404).json({ message: "User not found" });
     }
 
     res.json({ message: "User deleted successfully" });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ message: error.message });
   }
 });
 
@@ -490,11 +490,11 @@ router.get("/get-user", userAuth, async (req, res) => {
   try {
     const user = await User.findById(userId).select("-password -otp");
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(404).json({ message: "User not found" });
     }
     res.json(user);
   } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
@@ -504,11 +504,11 @@ router.get("/get-user/:id", userAuth, async (req, res) => {
   try {
     const user = await User.findById(userId).select("-password -otp");
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(404).json({ message: "User not found" });
     }
     res.json(user);
   } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
@@ -1042,7 +1042,7 @@ router.post("/add-review/:breederId", userAuth, async (req, res) => {
   } catch (error) {
     res
       .status(500)
-      .json({ message: "Internal server error", error: error.message });
+      .json({ message: "Internal server error", message: error.message });
   }
 });
 
@@ -1108,7 +1108,7 @@ router.post("/add-rating/:breederId", userAuth, async (req, res) => {
   } catch (error) {
     res
       .status(500)
-      .json({ message: "Internal server error", error: error.message });
+      .json({ message: "Internal server error", message: error.message });
   }
 });
 
@@ -1262,7 +1262,7 @@ router.get("/get-dogs", async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
