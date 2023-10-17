@@ -46,13 +46,16 @@ router.post("/register", async (req, res) => {
         .json({ error: "Please provide all the required fields" });
     }
     let UserFound;
+
     if (email) {
+      console.log("Email Check");
       UserFound = await User.findOne({
         email: email,
       });
     }
 
     if (phone) {
+      console.log("Phone Check");
       UserFound = await User.findOne({
         phone: phone,
       });
@@ -155,12 +158,21 @@ router.post("/register-web", async (req, res) => {
         .json({ error: "Please provide all the required fields" });
     }
 
-    const UserFound = await User.findOne({
-      $or: [
-        { email: email },
-        { phone: phone }, // Replace 'phoneNumber' with the actual phone number you want to search for
-      ],
-    });
+    let UserFound;
+
+    if (email) {
+      console.log("Email Check");
+      UserFound = await User.findOne({
+        email: email,
+      });
+    }
+
+    if (phone) {
+      console.log("Phone Check");
+      UserFound = await User.findOne({
+        phone: phone,
+      });
+    }
 
     if (UserFound) {
       return res.status(422).json({
