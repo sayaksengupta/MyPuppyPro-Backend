@@ -1282,7 +1282,7 @@ router.post("/add-preferences", userAuth, async (req, res) => {
 
     // Check if the preferencesToAdd array is not empty
     if (preferencesToAdd.length === 0) {
-      return res.status(400).json({ message: "Preferences array is empty" });
+      return res.status(400).json({ message: "Please select atleast one preference !" });
     }
 
     const newPreferences = [];
