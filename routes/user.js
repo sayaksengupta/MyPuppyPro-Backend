@@ -10,6 +10,7 @@ const Dog = require("../models/dogs");
 const Order = require("../models/orders");
 const { default: mongoose } = require("mongoose");
 const shortid = require("shortid");
+const DogReview = require("../models/DogReviews");
 
 router.get("/", (req, res) => {
   res.json({ message: "This is the User api" });
@@ -41,9 +42,10 @@ router.post("/register", async (req, res) => {
       (!email && !phone) ||
       !type
     ) {
-      return res
-        .status(400)
-        .json({ message: "Please provide all the required fields", success: false });
+      return res.status(400).json({
+        message: "Please provide all the required fields",
+        success: false,
+      });
     }
     let UserFound;
 
@@ -1112,6 +1114,114 @@ router.post("/add-rating/:breederId", userAuth, async (req, res) => {
   }
 });
 
+// Add Review to a Dog
+router.post("/add-dog-review/:dogId", userAuth, async (req, res) => {
+  try {
+    const userId = req.rootUser._id;
+    const { review } = req.body;
+    const dogId = req.params.dogId;
+
+    // Validate if the provided dogId is a valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(dogId)) {
+      return res.status(400).json({ message: "Invalid Dog ID" });
+    }
+
+    // Create a new review
+    const newReview = new DogReview({
+      userId,
+      dogId,
+      dogName: "Dog Name", // You can set the dog name here
+      review,
+    });
+
+    // Save the review to the database
+    await newReview.save();
+
+    res
+      .status(201)
+      .json({ message: "Review added successfully", review: newReview });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
+  }
+});
+
+// Add or Edit Rating for a Breeder
+router.post("/add-dog-rating/:dogId", userAuth, async (req, res) => {
+  try {
+    const userId = req.rootUser._id;
+    const { rating } = req.body;
+    const dogId = req.params.dogId;
+
+    // Validate if the provided dogId is a valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(dogId)) {
+      return res.status(400).json({ message: "Invalid Dog ID" });
+    }
+
+    // Find the dog review for the specific dog and user
+    let dogReview = await DogReview.findOne({ userId, dogId });
+
+    if (!dogReview) {
+      // If the review doesn't exist, create a new one
+      dogReview = new DogReview({
+        userId,
+        dogId,
+        ratings: [{ userId, rating }],
+      });
+    } else {
+      // Update the existing rating
+      const existingRatingIndex = dogReview.ratings.findIndex(
+        (r) => r.userId.toString() === userId.toString()
+      );
+      if (existingRatingIndex !== -1) {
+        // User has already rated the dog, update the existing rating
+        dogReview.ratings[existingRatingIndex].rating = rating;
+      } else {
+        // User hasn't rated the dog, add a new rating
+        dogReview.ratings.push({
+          userId,
+          rating,
+        });
+      }
+    }
+
+    // Calculate the new average rating for the dog
+    const totalRatings = dogReview.ratings.reduce(
+      (sum, r) => sum + r.rating,
+      0
+    );
+    const averageRating = totalRatings / dogReview.ratings.length;
+
+    // Update the dog's average rating
+    dogReview.averageRating = averageRating;
+
+    // Save the review to the database
+    await dogReview.save();
+
+    res.status(200).json({
+      message: "Rating added/updated successfully",
+      averageRating: dogReview.averageRating,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
+  }
+});
+
+// Get all dog reviews
+router.get("/get-all-dog-reviews", async (req, res) => {
+  try {
+    // Fetch all dog reviews from the database
+    const reviews = await DogReview.find();
+
+    res.status(200).json({ reviews });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error", error: error.message });
+  }
+});
+
 router.get("/filter-dogs", async (req, res) => {
   try {
     // Parse query parameters
@@ -1282,7 +1392,9 @@ router.post("/add-preferences", userAuth, async (req, res) => {
 
     // Check if the preferencesToAdd array is not empty
     if (preferencesToAdd.length === 0) {
-      return res.status(400).json({ message: "Please select atleast one preference !" });
+      return res
+        .status(400)
+        .json({ message: "Please select atleast one preference !" });
     }
 
     const newPreferences = [];
