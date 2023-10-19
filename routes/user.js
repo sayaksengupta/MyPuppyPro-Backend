@@ -1126,11 +1126,14 @@ router.post("/add-dog-review/:dogId", userAuth, async (req, res) => {
       return res.status(400).json({ message: "Invalid Dog ID" });
     }
 
+    const DogFound = await Dog.findById(dogId);
+
     // Create a new review
     const newReview = new DogReview({
       userId,
       dogId,
-      dogName: "Dog Name", // You can set the dog name here
+      image: DogFound.image,
+      dogName: DogFound.name, // You can set the dog name here
       review,
     });
 
@@ -1218,7 +1221,9 @@ router.get("/get-all-dog-reviews", async (req, res) => {
 
     res.status(200).json({ reviews });
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
 });
 
