@@ -1132,6 +1132,7 @@ router.post("/add-dog-review/:dogId", userAuth, async (req, res) => {
     const newReview = new DogReview({
       userId,
       dogId,
+      breed: DogFound.generic_name,
       image: DogFound.image,
       dogName: DogFound.name, // You can set the dog name here
       review,
