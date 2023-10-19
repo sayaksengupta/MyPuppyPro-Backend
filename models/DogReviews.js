@@ -13,6 +13,7 @@ const dogReviewSchema = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       ref: "DOGS",
     },
+    userName: String,
     dogName: String,
     breed: String,
     image: String,

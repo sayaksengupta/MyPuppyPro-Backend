@@ -1134,6 +1134,7 @@ router.post("/add-dog-review/:dogId", userAuth, async (req, res) => {
       dogId,
       breed: DogFound.generic_name,
       image: DogFound.image,
+      userName: req.rootUser.name,
       dogName: DogFound.name, // You can set the dog name here
       review,
     });
@@ -1351,6 +1352,26 @@ router.get("/find-dogs", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error", success: false });
+  }
+});
+
+router.get("/get-dog/:id", async (req, res) => {
+  try {
+    const dogId = req.params.id;
+
+    const DogFound = await Dog.findById(dogId);
+    const DogReviews = await DogReview.findOne({ dogId: dogId });
+    console.log(DogReviews);
+
+    return res.status(200).json({
+      message: "Dog Fetched !",
+      success: true,
+      dog: DogFound,
+      reviews: DogReviews,
+    });
+  } catch (e) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 });
 
