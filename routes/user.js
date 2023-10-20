@@ -366,6 +366,7 @@ router.patch("/update-user", userAuth, async (req, res) => {
     "phone",
     "country",
     "city",
+    "state",
     "profileImg",
     "coverImg"
   ];
