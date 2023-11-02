@@ -36,13 +36,25 @@ const dogSchema = new mongoose.Schema({
       weight: Number,
       image: String,
     },
-    grandfather: {
+    fratFather: {
       breed: mongoose.Schema.Types.ObjectId,
       DOB: Date,
       weight: Number,
       image: String,
     },
-    grandmother: {
+    fratMother: {
+      breed: mongoose.Schema.Types.ObjectId,
+      DOB: Date,
+      weight: Number,
+      image: String,
+    },
+    matFather: {
+      breed: mongoose.Schema.Types.ObjectId,
+      DOB: Date,
+      weight: Number,
+      image: String,
+    },
+    matMother: {
       breed: mongoose.Schema.Types.ObjectId,
       DOB: Date,
       weight: Number,

@@ -703,8 +703,10 @@ router.post("/add-pedigree/:dogId", userAuth, async (req, res) => {
     const allowedPedigreeFields = [
       "father",
       "mother",
-      "grandfather",
-      "grandmother",
+      "fratFather",
+      "fratMother",
+      "matFather",
+      "matMother",
     ];
 
     // Find the user and the dog by their IDs
