@@ -368,7 +368,7 @@ router.patch("/update-user", userAuth, async (req, res) => {
     "city",
     "state",
     "profileImg",
-    "coverImg"
+    "coverImg",
   ];
   const isValidOperation = Object.keys(updates).every((update) =>
     allowedUpdates.includes(update)
@@ -410,7 +410,7 @@ router.patch("/update-user", userAuth, async (req, res) => {
         pincode: user.pincode,
         type: user.type,
         profileImg: user.profileImg,
-        coverImg: user.coverImg
+        coverImg: user.coverImg,
       },
     });
   } catch (error) {
@@ -701,6 +701,8 @@ router.post("/add-pedigree/:dogId", userAuth, async (req, res) => {
     const { pedigreeDetails } = req.body;
 
     const allowedPedigreeFields = [
+      "DOB",
+      "weight",
       "father",
       "mother",
       "fratFather",
@@ -734,6 +736,14 @@ router.post("/add-pedigree/:dogId", userAuth, async (req, res) => {
         message: "You are not the owner of this dog.",
         success: false,
       });
+    }
+
+    if (req.body.DOB) {
+      dog.DOB = req.body.DOB;
+    }
+
+    if (req.body.weight) {
+      dog.weight = req.body.weight;
     }
 
     // Validate and update the pedigree details of the dog

@@ -14,6 +14,8 @@ const dogSchema = new mongoose.Schema({
   },
   generic_name: String,
   age: String,
+  DOB: String,
+  weight: Number,
   gender: String,
   disability: Boolean,
   address: String,
