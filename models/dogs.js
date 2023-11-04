@@ -71,7 +71,7 @@ const dogSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
-  image: String,
+  images: [String],
 });
 
 const Dog = mongoose.model("DOGS", dogSchema);

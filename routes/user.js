@@ -630,7 +630,7 @@ router.post("/add-dog", userAuth, async (req, res) => {
       comments,
       price,
       name,
-      image,
+      images,
     } = req.body;
 
     if (
@@ -643,7 +643,7 @@ router.post("/add-dog", userAuth, async (req, res) => {
       !address ||
       !price ||
       !name ||
-      !image
+      images.length == 0
     ) {
       return res
         .status(422)
@@ -680,7 +680,7 @@ router.post("/add-dog", userAuth, async (req, res) => {
       comments,
       price,
       name,
-      image,
+      images,
     });
 
     await newDog.save();
