@@ -361,6 +361,7 @@ router.patch("/update-user", userAuth, async (req, res) => {
   // Check if the provided fields are valid for update
   const allowedUpdates = [
     "name",
+    "password",
     "email",
     "address",
     "phone",
@@ -392,6 +393,10 @@ router.patch("/update-user", userAuth, async (req, res) => {
     Object.keys(updates).forEach((update) => {
       user[update] = updates[update];
     });
+
+    if (updates.password) {
+      user.password = bcrypt.hash(updates.password, 10);
+    }
 
     await user.save();
 
