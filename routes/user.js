@@ -1375,7 +1375,7 @@ router.get("/get-dog/:id", async (req, res) => {
     const dogId = req.params.id;
 
     const DogFound = await Dog.findById(dogId);
-    const DogReviews = await DogReview.findOne({ dogId: dogId });
+    const DogReviews = await DogReview.find({ dogId: dogId });
     console.log(DogReviews);
 
     return res.status(200).json({
