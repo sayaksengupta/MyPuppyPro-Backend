@@ -395,7 +395,7 @@ router.patch("/update-user", userAuth, async (req, res) => {
     });
 
     if (updates.password) {
-      user.password = bcrypt.hash(updates.password, 10);
+      user.password = await bcrypt.hash(updates.password, 10);
     }
 
     await user.save();
