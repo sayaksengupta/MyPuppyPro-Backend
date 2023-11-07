@@ -5,8 +5,7 @@ const jwt = require("jsonwebtoken");
 
 const reviewSchema = new mongoose.Schema(
   {
-    userId: mongoose.Types.ObjectId,
-    ref: "User",
+    userId: { type: mongoose.Types.ObjectId, ref: "User" },
     review: String,
   },
   { timestamps: true }
