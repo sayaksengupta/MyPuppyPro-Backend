@@ -7,6 +7,7 @@ const reviewSchema = new mongoose.Schema(
   {
     userId: { type: mongoose.Types.ObjectId, ref: "User" },
     review: String,
+    userName: String,
   },
   { timestamps: true }
 );
