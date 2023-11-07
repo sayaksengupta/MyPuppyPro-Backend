@@ -8,6 +8,9 @@ const reviewSchema = new mongoose.Schema(
     userId: { type: mongoose.Types.ObjectId, ref: "User" },
     review: String,
     userName: String,
+    dogName: String,
+    breed: String,
+    image: String,
   },
   { timestamps: true }
 );
@@ -30,6 +33,10 @@ const dogSchema = new mongoose.Schema({
   address: String,
   comments: String,
   price: Number,
+  active: {
+    type: Boolean,
+    default: false,
+  },
   soldStatus: {
     type: Boolean,
     default: false,

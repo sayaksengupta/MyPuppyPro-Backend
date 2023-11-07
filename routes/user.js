@@ -1152,7 +1152,10 @@ router.post("/add-dog-review/:dogId", userAuth, async (req, res) => {
     const newReview = {
       userId,
       review,
-      userName: req.rootUser.name
+      userName: req.rootUser.name,
+      dogName: dog.name,
+      breed: dog.generic_name,
+      image: dog.images.length > 0 ? dog.images[0] : dog.image,
     };
 
     // Add the new review to the dog's reviews array
