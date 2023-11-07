@@ -1152,6 +1152,7 @@ router.post("/add-dog-review/:dogId", userAuth, async (req, res) => {
     const newReview = {
       userId,
       review,
+      userName: req.rootUser.name
     };
 
     // Add the new review to the dog's reviews array
@@ -1374,14 +1375,11 @@ router.get("/get-dog/:id", async (req, res) => {
     const dogId = req.params.id;
 
     const DogFound = await Dog.findById(dogId);
-    const DogReviews = await DogReview.find({ dogId: dogId });
-    console.log(DogReviews);
 
     return res.status(200).json({
       message: "Dog Fetched !",
       success: true,
       dog: DogFound,
-      reviews: DogReviews,
     });
   } catch (e) {
     console.error(error);
