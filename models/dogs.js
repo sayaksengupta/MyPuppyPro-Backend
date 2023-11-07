@@ -3,6 +3,15 @@ const validator = require("validator");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
+const reviewSchema = new mongoose.Schema(
+  {
+    userId: mongoose.Types.ObjectId,
+    ref: "User",
+    review: String,
+  },
+  { timestamps: true }
+);
+
 const dogSchema = new mongoose.Schema({
   breed: {
     type: mongoose.Schema.Types.ObjectId,
@@ -67,10 +76,14 @@ const dogSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
-  active: {
-    type: Boolean,
-    default: true,
-  },
+  averageRating: Number,
+  ratings: [
+    {
+      userId: mongoose.Types.ObjectId,
+      rating: Number,
+    },
+  ],
+  reviews: [reviewSchema],
   images: [String],
 });
 

@@ -1142,21 +1142,30 @@ router.post("/add-dog-review/:dogId", userAuth, async (req, res) => {
       return res.status(400).json({ message: "Invalid Dog ID" });
     }
 
-    const DogFound = await Dog.findById(dogId);
+    const dog = await Dog.findById(dogId);
+
+    if (!dog) {
+      return res.status(404).json({ message: "Dog not found" });
+    }
 
     // Create a new review
-    const newReview = new DogReview({
+    const newReview = {
       userId,
-      dogId,
-      breed: DogFound.generic_name,
-      image: DogFound.image,
-      userName: req.rootUser.name,
-      dogName: DogFound.name, // You can set the dog name here
       review,
-    });
+    };
 
-    // Save the review to the database
-    await newReview.save();
+    // Add the new review to the dog's reviews array
+    dog.reviews.push(newReview);
+
+    // Calculate the new average rating for the dog
+    const totalRatings = dog.ratings.reduce((sum, r) => sum + r.rating, 0);
+    const averageRating = totalRatings / dog.ratings.length;
+
+    // Update the dog's average rating
+    dog.averageRating = averageRating;
+
+    // Save the dog document with the new review and average rating
+    await dog.save();
 
     res
       .status(201)
@@ -1180,49 +1189,36 @@ router.post("/add-dog-rating/:dogId", userAuth, async (req, res) => {
       return res.status(400).json({ message: "Invalid Dog ID" });
     }
 
-    // Find the dog review for the specific dog and user
-    let dogReview = await DogReview.findOne({ userId, dogId });
+    const dog = await Dog.findById(dogId);
 
-    if (!dogReview) {
-      // If the review doesn't exist, create a new one
-      dogReview = new DogReview({
-        userId,
-        dogId,
-        ratings: [{ userId, rating }],
-      });
+    if (!dog) {
+      return res.status(404).json({ message: "Dog not found" });
+    }
+
+    // Find the user's existing rating for the dog
+    const userRating = dog.ratings.find((r) => r.userId.equals(userId));
+
+    if (userRating) {
+      // Update the user's existing rating
+      userRating.rating = rating;
     } else {
-      // Update the existing rating
-      const existingRatingIndex = dogReview.ratings.findIndex(
-        (r) => r.userId.toString() === userId.toString()
-      );
-      if (existingRatingIndex !== -1) {
-        // User has already rated the dog, update the existing rating
-        dogReview.ratings[existingRatingIndex].rating = rating;
-      } else {
-        // User hasn't rated the dog, add a new rating
-        dogReview.ratings.push({
-          userId,
-          rating,
-        });
-      }
+      // Add a new rating for the user
+      dog.ratings.push({ userId, rating });
     }
 
     // Calculate the new average rating for the dog
-    const totalRatings = dogReview.ratings.reduce(
-      (sum, r) => sum + r.rating,
-      0
-    );
-    const averageRating = totalRatings / dogReview.ratings.length;
+    const totalRatings = dog.ratings.reduce((sum, r) => sum + r.rating, 0);
+    const averageRating = totalRatings / dog.ratings.length;
 
     // Update the dog's average rating
-    dogReview.averageRating = averageRating;
+    dog.averageRating = averageRating;
 
-    // Save the review to the database
-    await dogReview.save();
+    // Save the dog document with the updated rating and average rating
+    await dog.save();
 
     res.status(200).json({
       message: "Rating added/updated successfully",
-      averageRating: dogReview.averageRating,
+      averageRating: dog.averageRating,
     });
   } catch (error) {
     res
@@ -1235,9 +1231,11 @@ router.post("/add-dog-rating/:dogId", userAuth, async (req, res) => {
 router.get("/get-all-dog-reviews", async (req, res) => {
   try {
     // Fetch all dog reviews from the database
-    const reviews = await DogReview.find();
+    const dogs = await Dog.find({}, "reviews");
 
-    res.status(200).json({ reviews });
+    const allReviews = dogs.map((dog) => dog.reviews).flat();
+
+    res.status(200).json({ reviews: allReviews });
   } catch (error) {
     res
       .status(500)
