@@ -1181,6 +1181,39 @@ router.post("/add-dog-review/:dogId", userAuth, async (req, res) => {
   }
 });
 
+router.get("/get-user-by-dog/:dogId", userAuth, async (req, res) => {
+  try {
+    const dogId = req.params.dogId;
+    const DogFound = await Dog.findById(dogId);
+
+    if (!DogFound) {
+      return res.status(404).json({
+        message: "Dog not found !",
+        success: false,
+      });
+    }
+
+    const Breeder = await User.findById(DogFound.user).select("-password -otp");
+
+    if (!Breeder) {
+      return res.status(404).json({
+        message: "Breeder not found !",
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Breeder Fetched !",
+      success: true,
+      Breeder: Breeder,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
+  }
+});
+
 // Add or Edit Rating for a Breeder
 router.post("/add-dog-rating/:dogId", userAuth, async (req, res) => {
   try {
