@@ -504,7 +504,7 @@ router.get("/get-user", userAuth, async (req, res) => {
   }
 });
 
-router.get("/get-user/:id", userAuth, async (req, res) => {
+router.get("/get-user/:id", async (req, res) => {
   const userId = req.params.id;
 
   try {
