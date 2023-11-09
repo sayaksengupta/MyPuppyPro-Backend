@@ -77,6 +77,7 @@ const userSchema = new mongoose.Schema({
       image: String,
     },
   ],
+  pastPuppies: [String],
   active: {
     type: Boolean,
     default: false,

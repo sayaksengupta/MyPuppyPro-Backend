@@ -1512,6 +1512,47 @@ router.post("/add-preferences", userAuth, async (req, res) => {
   }
 });
 
+router.post("/add-past-puppy", userAuth, async (req, res) => {
+  try {
+    const user = req.rootUser;
+    const image = req.body.image; // You should include this in the request body
+
+    if (!image) {
+      return res.status(400).json({ error: "Past puppy name is required" });
+    }
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Add the past puppy to the user's document
+    user.pastPuppies.push(image);
+    await user.save();
+
+    return res.status(200).json({ message: "Past puppy added successfully" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
+router.get("/get-past-puppies", userAuth, async (req, res) => {
+  try {
+    const user = req.rootUser;
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Return the user's past puppies
+    return res.status(200).json({ pastPuppies: user.pastPuppies });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
+
 router.get("/logout", userAuth, async (req, res) => {
   try {
     res.status(200).send({ message: "logged out successfully!" });
