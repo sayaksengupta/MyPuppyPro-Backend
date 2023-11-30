@@ -1181,7 +1181,7 @@ router.post("/add-dog-review/:dogId", userAuth, async (req, res) => {
   }
 });
 
-router.get("/get-user-by-dog/:dogId", userAuth, async (req, res) => {
+router.get("/get-user-by-dog/:dogId", async (req, res) => {
   try {
     const dogId = req.params.dogId;
     const DogFound = await Dog.findById(dogId);
