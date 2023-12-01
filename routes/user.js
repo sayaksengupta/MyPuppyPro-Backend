@@ -518,7 +518,7 @@ router.get("/get-user/:id", async (req, res) => {
   }
 });
 
-router.get("/get-user-dogs", userAuth, async (req, res) => {
+router.get("/get-user-dogs", async (req, res) => {
   try {
     const user_id = req.rootUser._id;
 
