@@ -518,9 +518,9 @@ router.get("/get-user/:id", async (req, res) => {
   }
 });
 
-router.get("/get-user-dogs", async (req, res) => {
+router.get("/get-user-dogs/:userId", async (req, res) => {
   try {
-    const user_id = req.rootUser._id;
+    const user_id = req.params.userId;
 
     // Find dogs associated with the user and populate the 'breed' field
     const userDogs = await Dog.find({ user: user_id }).select({
