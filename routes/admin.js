@@ -1,45 +1,30 @@
 const express = require("express");
 const router = express.Router();
-const Admin = require('../models/admins');
+const Admin = require("../models/admins");
 const bcrypt = require("bcrypt");
 const adminAuth = require("../middleware/adminAuth");
-const User = require('../models/users');
+const User = require("../models/users");
 const Category = require("../models/categories");
 const Breed = require("../models/breeds");
-
-
 
 router.get("/", (req, res) => {
   res.json({ message: "This is the admin api" });
 });
 
-router.get("/auth-check", adminAuth, async(req,res) => {
-  try{
+router.get("/auth-check", adminAuth, async (req, res) => {
+  try {
     const admin = req.rootUser;
 
-    return res.status(200).json({admin : admin})
-
-  }catch(e){
+    return res.status(200).json({ admin: admin });
+  } catch (e) {
     res.status(500).json({ message: `Your Session has expired !` });
   }
-})
+});
 
 router.post("/register", async (req, res) => {
-  const {
-    email,
-    password,
-    cpassword,
-    mobile,
-    name
-  } = req.body;
+  const { email, password, cpassword, mobile, name } = req.body;
 
-  if (
-    !email ||
-    !password ||
-    !cpassword ||
-    !mobile || 
-    !name
-  ) {
+  if (!email || !password || !cpassword || !mobile || !name) {
     return res.status(422).json({ error: "Please fill all the fields." });
   }
 
@@ -59,19 +44,25 @@ router.post("/register", async (req, res) => {
         email,
         password,
         cpassword,
-        mobile
+        mobile,
       });
 
       const registered = await admin.save();
 
       const token = await registered.generateAuthToken();
-  
+
       res.cookie("jwt", token, {
         expires: new Date(Date.now() + 60000000),
         httpOnly: true,
       });
 
-      res.status(201).json({ message: "Registered Successfully!", token : token, admin : admin});
+      res
+        .status(201)
+        .json({
+          message: "Registered Successfully!",
+          token: token,
+          admin: admin,
+        });
     }
   } catch (e) {
     res.status(500).json({ message: `Could not create account! --> ${e}` });
@@ -88,107 +79,98 @@ router.post("/login", async (req, res) => {
       return res.status(422).json({ error: "Please fill all the fields." });
     }
 
-    const userByMobile = await Admin.findOne({mobile : logMobile});
+    const userByMobile = await Admin.findOne({ mobile: logMobile });
     const userEmail = await Admin.findOne({ email: logEmail });
 
+    if (userEmail) {
+      const passCheck = await bcrypt.compare(logPass, userEmail.password);
+      const token = await userEmail.generateAuthToken();
 
-    if(userEmail){
-    const passCheck = await bcrypt.compare(logPass, userEmail.password);
-    const token = await userEmail.generateAuthToken();
+      if (passCheck) {
+        res.status(200).json({
+          message: "Logged In Successfully!",
+          token: token,
+          success: true,
+          admin: userEmail,
+        });
+      } else {
+        res.status(400).json({ message: "Invalid login credentials" });
+      }
+    } else if (userByMobile) {
+      const passCheck = await bcrypt.compare(logPass, userByMobile.password);
+      const token = await userByMobile.generateAuthToken();
 
-
-
-    if (passCheck) {
-      res.status(200).json({
-        message: "Logged In Successfully!",
-        token: token,
-        success: true,
-        admin: userEmail,
+      res.cookie("jwt", token, {
+        expires: new Date(Date.now() + 60000000),
+        httpOnly: true,
       });
+
+      if (passCheck) {
+        res.status(200).json({
+          message: "Logged In Successfully!",
+          token: token,
+          success: true,
+          admin: userByMobile,
+        });
+      } else {
+        res.status(400).json({ message: "Invalid login credentials" });
+      }
     } else {
       res.status(400).json({ message: "Invalid login credentials" });
     }
-  } 
-
- else if(userByMobile){
-  const passCheck = await bcrypt.compare(logPass, userByMobile.password);
-  const token = await userByMobile.generateAuthToken();
-
-  res.cookie("jwt", token, {
-    expires: new Date(Date.now() + 60000000),
-    httpOnly: true,
-  });
-
-
-  if (passCheck) {
-    res.status(200).json({
-      message: "Logged In Successfully!",
-      token: token,
-      success: true,
-      admin: userByMobile,
-    });
-  } else {
-    res.status(400).json({ message: "Invalid login credentials" });
-  }
-} else {
-  res.status(400).json({ message: "Invalid login credentials" });
-}
-  
- } catch (error) {
+  } catch (error) {
     res.status(500).json({ message: "Invalid login credentials" });
   }
 });
 
-
 router.get("/logout", adminAuth, async (req, res) => {
-    try {
-      res.status(200).send({ message: "logged out successfully!" });
-    } catch (e) {
-      res.status(500).send(e);
+  try {
+    res.status(200).send({ message: "logged out successfully!" });
+  } catch (e) {
+    res.status(500).send(e);
+  }
+});
+
+router.delete("/remove-admin/:id", async (req, res) => {
+  const _id = req.params.id;
+  try {
+    if (!_id) {
+      res.status(422).json({ message: "Please Provide Admin ID." });
     }
-  });
+    const deleteAdmin = await Admin.findByIdAndDelete(_id);
 
-  router.delete("/remove-admin/:id", async (req,res) => {
-    const _id = req.params.id;
-    try{
-      if(!_id){
-        res.status(422).json({message : "Please Provide Admin ID."})
-      }
-      const deleteAdmin = await Admin.findByIdAndDelete(_id);
-
-      if(deleteAdmin){
-        res.status(200).json({message: "Admin Deleted !"});
-      }else{
-        res.status(404).json({error : "Could Not Find Admin !"});
-      }
-    }catch (e) {
-     res.status(500).json({ message: `Could not find admin --> ${e}` });
+    if (deleteAdmin) {
+      res.status(200).json({ message: "Admin Deleted !" });
+    } else {
+      res.status(404).json({ error: "Could Not Find Admin !" });
     }
-  })
-
+  } catch (e) {
+    res.status(500).json({ message: `Could not find admin --> ${e}` });
+  }
+});
 
 //   router.post('/forgot-password', async (req,res) => {
 //     try{
 //       const {email} = req.body;
-  
+
 //       if(!email){
 //         return res.status(422).json({
 //           message : "Please provide the email",
 //           success : false
 //         })
 //       }
-  
+
 //       const ResetPasswordAdmin = await Admin.findOne({email : email})
-  
+
 //        if(ResetPasswordAdmin){
-  
+
 //       const mailOptions = {
 //         from: 'growsharp.india@gmail.com',
 //         to: email,
 //         subject: 'Reset Password',
 //         html: forgotEmailBody
 //       };
-  
+
 //       transporter.sendMail(mailOptions, function(error, info){
 //         if(error){
 //           console.log(error);
@@ -206,73 +188,76 @@ router.get("/logout", adminAuth, async (req, res) => {
 //         success : false
 //       })
 //     }
-    
-      
+
 //     }catch(e){
 //       res.status(500).json({ message: `Server Error --> ${e}` });
 //     }
 //   })
 
+router.post("/change-password", async (req, res) => {
+  try {
+    const { password, cpassword } = req.body;
 
-  router.post('/change-password' , async(req,res) => {
-    try{
-  
-      const {password, cpassword} = req.body;
-  
-      if(!password || !cpassword){
-        return res.status(422).json({
-          message : "Please fill all the fields !",
-          success : false
-        })
-      }
-
-      if(password !== cpassword){
-        return res.status(422).json({
-          message : "Passwords are not matching !",
-          success : false
-        })
-      }
-  
-      const AdminFound = await Admin.findOne();
-  
-      if(AdminFound){
-        let hashedPass = await bcrypt.hash(password, 10);
-        let hashedcPass = await bcrypt.hash(cpassword, 10);
-        const ResetPassword = await Admin.findByIdAndUpdate(AdminFound._id, {password : hashedPass, cpassword : hashedcPass}, {new : true})
-        if(ResetPassword){
-          return res.status(200).json({
-            message : "Password Reset Successfully !",
-            success : true
-          })
-        }else{
-          return res.status(200).json({
-            message : "Password could not be reset !",
-            success : false
-          })
-        }
-      }else{
-        return res.status(404).json({
-          message : "Admin not found !",
-          success : false
-        })
-      }
-    }catch(e){
-      return res.status(500).json({
-        message : `Server Error --> ${e}`,
-        success : false
-      })
+    if (!password || !cpassword) {
+      return res.status(422).json({
+        message: "Please fill all the fields !",
+        success: false,
+      });
     }
-  });
 
-  router.get('/get-all-users/:type', adminAuth, async (req, res) => {
-    try {
-      const {type} = req.params;
-      const users = await User.find({type: type});
-      res.status(200).json(users);
-    } catch (error) {
-      res.status(500).json({ message: `Server Error --> ${error}`, success: false });
+    if (password !== cpassword) {
+      return res.status(422).json({
+        message: "Passwords are not matching !",
+        success: false,
+      });
     }
-  });
+
+    const AdminFound = await Admin.findOne();
+
+    if (AdminFound) {
+      let hashedPass = await bcrypt.hash(password, 10);
+      let hashedcPass = await bcrypt.hash(cpassword, 10);
+      const ResetPassword = await Admin.findByIdAndUpdate(
+        AdminFound._id,
+        { password: hashedPass, cpassword: hashedcPass },
+        { new: true }
+      );
+      if (ResetPassword) {
+        return res.status(200).json({
+          message: "Password Reset Successfully !",
+          success: true,
+        });
+      } else {
+        return res.status(200).json({
+          message: "Password could not be reset !",
+          success: false,
+        });
+      }
+    } else {
+      return res.status(404).json({
+        message: "Admin not found !",
+        success: false,
+      });
+    }
+  } catch (e) {
+    return res.status(500).json({
+      message: `Server Error --> ${e}`,
+      success: false,
+    });
+  }
+});
+
+router.get("/get-all-users/:type", adminAuth, async (req, res) => {
+  try {
+    const { type } = req.params;
+    const users = await User.find({ type: type });
+    res.status(200).json(users);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: `Server Error --> ${error}`, success: false });
+  }
+});
 
 // router.get("/get-all-services", adminAuth, async (req, res) => {
 //   try {
@@ -305,74 +290,119 @@ router.get("/logout", adminAuth, async (req, res) => {
 //   }
 // });
 
-router.patch('/change-user-status/:id', async (req, res) => {
-    const { id } = req.params;
-  
-    try {
-      const user = await User.findById(id);
-      if (!user) {
-        return res.status(404).json({ message: 'User not found', success: false });
-      }
-  
-      user.active = !user.active; // Toggle the status
-      await user.save();
-  
-      res.status(200).json({ message: 'User status toggled successfully', active: user.active, success:true });
-    } catch (error) {
-      res.status(500).json({ message: `Internal server error --> ${error}`, success:false });
-    }
-  });
+router.patch("/change-user-status/:id", async (req, res) => {
+  const { id } = req.params;
 
-  router.patch('/change-category-status/:id', async (req, res) => {
-    const { id } = req.params;
-  
-    try {
-      const category = await Category.findById(id);
-      if (!category) {
-        return res.status(404).json({ message: 'Category not found', success: false });
-      }
-  
-      category.active = !category.active; // Toggle the status
-      await category.save();
-  
-      res.status(200).json({ message: 'Category status toggled successfully', active: category.active, success:true });
-    } catch (error) {
-      res.status(500).json({ message: `Internal server error --> ${error}`, success:false });
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ message: "User not found", success: false });
     }
-  });
 
-  router.patch('/change-breed-status/:id', async (req, res) => {
-    const { id } = req.params;
-  
-    try {
-      const breed = await Breed.findById(id);
-      if (!breed) {
-        return res.status(404).json({ message: 'Breed not found', success: false });
-      }
-  
-      breed.active = !breed.active; // Toggle the status
-      await breed.save();
-  
-      res.status(200).json({ message: 'Breed status toggled successfully', active: breed.active, success:true });
-    } catch (error) {
-      res.status(500).json({ message: `Internal server error --> ${error}`, success:false });
+    user.active = !user.active; // Toggle the status
+    await user.save();
+
+    res
+      .status(200)
+      .json({
+        message: "User status toggled successfully",
+        active: user.active,
+        success: true,
+      });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: `Internal server error --> ${error}`, success: false });
+  }
+});
+
+router.patch("/change-category-status/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const category = await Category.findById(id);
+    if (!category) {
+      return res
+        .status(404)
+        .json({ message: "Category not found", success: false });
     }
-  });
 
-  router.delete('/delete-user/:id', async (req, res) => {
-    const { id } = req.params;
-  
-    try {
-      const user = await User.findByIdAndDelete(id);
-      if (!user) {
-        return res.status(404).json({ message: 'User not found', success: false });
-      }
-  
-      res.status(200).json({ message: 'User deleted successfully', success : true });
-    } catch (error) {
-       res.status(500).json({ message: `Internal server error --> ${error}`, success: false });
+    category.active = !category.active; // Toggle the status
+    await category.save();
+
+    res
+      .status(200)
+      .json({
+        message: "Category status toggled successfully",
+        active: category.active,
+        success: true,
+      });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: `Internal server error --> ${error}`, success: false });
+  }
+});
+
+router.patch("/change-breed-status/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const breed = await Breed.findById(id);
+    if (!breed) {
+      return res
+        .status(404)
+        .json({ message: "Breed not found", success: false });
     }
-  });
 
-  
-  module.exports = router;
+    breed.active = !breed.active; // Toggle the status
+    await breed.save();
+
+    res
+      .status(200)
+      .json({
+        message: "Breed status toggled successfully",
+        active: breed.active,
+        success: true,
+      });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: `Internal server error --> ${error}`, success: false });
+  }
+});
+
+router.delete("/delete-user/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const user = await User.findByIdAndDelete(id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ message: "User not found", success: false });
+    }
+
+    res
+      .status(200)
+      .json({ message: "User deleted successfully", success: true });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: `Internal server error --> ${error}`, success: false });
+  }
+});
+
+// Check Token API
+router.get("/check-token", adminAuth, async (req, res) => {
+  try {
+    // If the middleware passed, the token is valid
+    res.status(200).json({ message: "Token is valid" });
+  } catch (error) {
+    res.status(500).json({ error: "Unable to verify token" });
+  }
+});
+
+module.exports = router;
