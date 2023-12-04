@@ -404,10 +404,10 @@ router.get("/get-all-dogs", adminAuth, async (req, res) => {
                 name: 1,
                 email: 1,
                 phone: 1,
-                address: 1
-              }
-            }
-          ]
+                address: 1,
+              },
+            },
+          ],
         },
       },
       {
@@ -439,6 +439,82 @@ router.get("/get-all-dogs", adminAuth, async (req, res) => {
       .json({ message: "Dogs fetched !", success: true, Dogs: Dogs });
   } catch (error) {
     res.status(500).json({ error: "Dogs not found !" });
+  }
+});
+
+// Change status (toggle active flag) for a dog
+router.put("/toggle-active/:dogId", adminAuth, async (req, res) => {
+  try {
+    const dogId = req.params.dogId;
+
+    // Find the dog by ID
+    const dog = await Dog.findById(dogId);
+
+    if (!dog) {
+      return res.status(404).json({ error: "Dog not found" });
+    }
+
+    // Toggle the active flag
+    dog.active = !dog.active;
+
+    // Save the updated dog
+    await dog.save();
+
+    res
+      .status(200)
+      .json({ message: "Dog status changed successfully", success: true, dog });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Change status (toggle soldStatus flag) for a dog
+router.put("/toggle-sold/:dogId", adminAuth, async (req, res) => {
+  try {
+    const dogId = req.params.dogId;
+
+    // Find the dog by ID
+    const dog = await Dog.findById(dogId);
+
+    if (!dog) {
+      return res.status(404).json({ error: "Dog not found" });
+    }
+
+    // Toggle the active flag
+    dog.soldStatus = !dog.soldStatus;
+
+    // Save the updated dog
+    await dog.save();
+
+    res
+      .status(200)
+      .json({ message: "Dog status changed successfully", success: true, dog });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Delete a dog by ID
+router.delete("/delete-dog/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const dog = await Dog.findByIdAndDelete(id);
+    if (!dog) {
+      return res
+        .status(404)
+        .json({ message: "Dog not found", success: false });
+    }
+
+    res
+      .status(200)
+      .json({ message: "Dog deleted successfully", success: true });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: `Internal server error --> ${error}`, success: false });
   }
 });
 
