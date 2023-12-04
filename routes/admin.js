@@ -6,6 +6,7 @@ const adminAuth = require("../middleware/adminAuth");
 const User = require("../models/users");
 const Category = require("../models/categories");
 const Breed = require("../models/breeds");
+const Dog = require("../models/dogs");
 
 router.get("/", (req, res) => {
   res.json({ message: "This is the admin api" });
@@ -56,13 +57,11 @@ router.post("/register", async (req, res) => {
         httpOnly: true,
       });
 
-      res
-        .status(201)
-        .json({
-          message: "Registered Successfully!",
-          token: token,
-          admin: admin,
-        });
+      res.status(201).json({
+        message: "Registered Successfully!",
+        token: token,
+        admin: admin,
+      });
     }
   } catch (e) {
     res.status(500).json({ message: `Could not create account! --> ${e}` });
@@ -304,13 +303,11 @@ router.patch("/change-user-status/:id", async (req, res) => {
     user.active = !user.active; // Toggle the status
     await user.save();
 
-    res
-      .status(200)
-      .json({
-        message: "User status toggled successfully",
-        active: user.active,
-        success: true,
-      });
+    res.status(200).json({
+      message: "User status toggled successfully",
+      active: user.active,
+      success: true,
+    });
   } catch (error) {
     res
       .status(500)
@@ -332,13 +329,11 @@ router.patch("/change-category-status/:id", async (req, res) => {
     category.active = !category.active; // Toggle the status
     await category.save();
 
-    res
-      .status(200)
-      .json({
-        message: "Category status toggled successfully",
-        active: category.active,
-        success: true,
-      });
+    res.status(200).json({
+      message: "Category status toggled successfully",
+      active: category.active,
+      success: true,
+    });
   } catch (error) {
     res
       .status(500)
@@ -360,13 +355,11 @@ router.patch("/change-breed-status/:id", async (req, res) => {
     breed.active = !breed.active; // Toggle the status
     await breed.save();
 
-    res
-      .status(200)
-      .json({
-        message: "Breed status toggled successfully",
-        active: breed.active,
-        success: true,
-      });
+    res.status(200).json({
+      message: "Breed status toggled successfully",
+      active: breed.active,
+      success: true,
+    });
   } catch (error) {
     res
       .status(500)
@@ -392,6 +385,60 @@ router.delete("/delete-user/:id", async (req, res) => {
     res
       .status(500)
       .json({ message: `Internal server error --> ${error}`, success: false });
+  }
+});
+
+router.get("/get-all-dogs", adminAuth, async (req, res) => {
+  try {
+    const Dogs = await Dog.aggregate([
+      {
+        $lookup: {
+          from: "users",
+          localField: "user",
+          foreignField: "_id",
+          as: "UserData",
+          pipeline: [
+            {
+              $project: {
+                _id: 0,
+                name: 1,
+                email: 1,
+                phone: 1,
+                address: 1
+              }
+            }
+          ]
+        },
+      },
+      {
+        $unwind: {
+          path: "$UserData",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          user: "$UserData",
+          generic_name: 1,
+          age: 1,
+          gender: 1,
+          disability: 1,
+          address: 1,
+          price: 1,
+          active: 1,
+          soldStatus: 1,
+          name: 1,
+          image: { $arrayElemAt: ["$images", 0] },
+          averageRating: 1,
+        },
+      },
+    ]);
+    // If the middleware passed, the token is valid
+    res
+      .status(200)
+      .json({ message: "Dogs fetched !", success: true, Dogs: Dogs });
+  } catch (error) {
+    res.status(500).json({ error: "Dogs not found !" });
   }
 });
 
