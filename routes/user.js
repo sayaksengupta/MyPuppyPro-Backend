@@ -1248,7 +1248,7 @@ router.post("/add-dog-rating/:dogId", userAuth, async (req, res) => {
     const averageRating = totalRatings / dog.ratings.length;
 
     // Update the dog's average rating
-    dog.averageRating = averageRating;
+    dog.averageRating = averageRating? averageRating : 0;
 
     // Save the dog document with the updated rating and average rating
     await dog.save();
