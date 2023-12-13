@@ -585,7 +585,7 @@ router.post("/add-states-bulk", adminAuth, async (req, res) => {
 // Fetch all states
 router.get("/get-all-states", async (req, res) => {
   try {
-    const allStates = await State.find({}, { _id: 0, __v: 0, createdAt: 0, updatedAt: 0 }); // Exclude _id and __v fields
+    const allStates = await State.find({}, {  __v: 0, createdAt: 0, updatedAt: 0 }); // Exclude _id and __v fields
 
     return res.status(200).json({
       message: "States Fetched !",
