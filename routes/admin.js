@@ -564,10 +564,15 @@ router.post("/add-states-bulk", adminAuth, async (req, res) => {
       });
     }
 
-    const statesAdded = await State.insertMany(states);
+    // Convert state names to lowercase
+    const statesToAdd = states.map((state) => ({
+      name: state.name.toLowerCase(),
+    }));
+
+    const statesAdded = await State.insertMany(statesToAdd);
 
     if (statesAdded && statesAdded.length > 0) {
-      const addedStateNames = statesAdded.map((state) => state.name.toLowerCase());
+      const addedStateNames = statesAdded.map((state) => state.name);
 
       return res.status(200).json({
         message: `${addedStateNames.join(", ")} added successfully!`,
@@ -585,7 +590,10 @@ router.post("/add-states-bulk", adminAuth, async (req, res) => {
 // Fetch all states
 router.get("/get-all-states", async (req, res) => {
   try {
-    const allStates = await State.find({}, {  __v: 0, createdAt: 0, updatedAt: 0 }); // Exclude _id and __v fields
+    const allStates = await State.find(
+      {},
+      { __v: 0, createdAt: 0, updatedAt: 0 }
+    ); // Exclude _id and __v fields
 
     return res.status(200).json({
       message: "States Fetched !",
@@ -632,7 +640,5 @@ router.delete("/delete-state/:stateId", adminAuth, async (req, res) => {
     });
   }
 });
-
-
 
 module.exports = router;
