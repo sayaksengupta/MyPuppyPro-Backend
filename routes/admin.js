@@ -7,6 +7,7 @@ const User = require("../models/users");
 const Category = require("../models/categories");
 const Breed = require("../models/breeds");
 const Dog = require("../models/dogs");
+const State = require("../models/states");
 
 router.get("/", (req, res) => {
   res.json({ message: "This is the admin api" });
@@ -503,9 +504,7 @@ router.delete("/delete-dog/:id", async (req, res) => {
   try {
     const dog = await Dog.findByIdAndDelete(id);
     if (!dog) {
-      return res
-        .status(404)
-        .json({ message: "Dog not found", success: false });
+      return res.status(404).json({ message: "Dog not found", success: false });
     }
 
     res
@@ -527,5 +526,113 @@ router.get("/check-token", adminAuth, async (req, res) => {
     res.status(500).json({ error: "Unable to verify token" });
   }
 });
+
+router.post("/add-state", adminAuth, async (req, res) => {
+  try {
+    const { state } = req.body;
+
+    if (!state) {
+      return res.status(422).json({
+        message: "Please provide State Name !",
+        success: false,
+      });
+    }
+
+    const stateAdded = await State.create({ name: state.toLowerCase() });
+
+    if (stateAdded) {
+      return res.status(200).json({
+        message: `${stateAdded.name} added successfully !`,
+        success: true,
+      });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: `Internal server error --> ${error}`, success: false });
+  }
+});
+
+router.post("/add-states-bulk", adminAuth, async (req, res) => {
+  try {
+    const { states } = req.body;
+
+    if (!states || !Array.isArray(states) || states.length === 0) {
+      return res.status(422).json({
+        message: "Please provide an array of states to add!",
+        success: false,
+      });
+    }
+
+    const statesAdded = await State.insertMany(states);
+
+    if (statesAdded && statesAdded.length > 0) {
+      const addedStateNames = statesAdded.map((state) => state.name.toLowerCase());
+
+      return res.status(200).json({
+        message: `${addedStateNames.join(", ")} added successfully!`,
+        success: true,
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: `Internal server error --> ${error}`,
+      success: false,
+    });
+  }
+});
+
+// Fetch all states
+router.get("/get-all-states", async (req, res) => {
+  try {
+    const allStates = await State.find({}, { _id: 0, __v: 0, createdAt: 0, updatedAt: 0 }); // Exclude _id and __v fields
+
+    return res.status(200).json({
+      message: "States Fetched !",
+      states: allStates,
+      success: true,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: `Internal server error --> ${error}`,
+      success: false,
+    });
+  }
+});
+
+// Delete State
+router.delete("/delete-state/:stateId", adminAuth, async (req, res) => {
+  try {
+    const { stateId } = req.params;
+
+    if (!stateId) {
+      return res.status(422).json({
+        message: "Please provide a State ID to delete!",
+        success: false,
+      });
+    }
+
+    const deletedState = await State.findByIdAndDelete(stateId);
+
+    if (deletedState) {
+      return res.status(200).json({
+        message: `${deletedState.name} deleted successfully!`,
+        success: true,
+      });
+    } else {
+      return res.status(404).json({
+        message: "State not found!",
+        success: false,
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: `Internal server error --> ${error}`,
+      success: false,
+    });
+  }
+});
+
+
 
 module.exports = router;
