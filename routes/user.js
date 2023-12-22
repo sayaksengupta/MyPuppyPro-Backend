@@ -132,27 +132,27 @@ router.post("/register", async (req, res) => {
 router.post("/register-web", async (req, res) => {
   const {
     name,
+    email,
     password,
-    address,
-    country,
-    city,
     type,
-    state,
-    pincode,
     profileImg,
+    // address,
+    // country,
+    // city,
+    // state,
+    // pincode,
   } = req.body;
 
-  let { email, phone } = req.body;
 
   try {
     // Check if all the other fields are provided
     if (
       !name ||
       !password ||
-      !address ||
-      !country ||
-      !city ||
-      (!email && !phone) ||
+      // !address ||
+      // !country ||
+      // !city ||
+      !email ||
       !type
     ) {
       return res
@@ -169,12 +169,12 @@ router.post("/register-web", async (req, res) => {
       });
     }
 
-    if (phone) {
-      console.log("Phone Check");
-      UserFound = await User.findOne({
-        phone: phone,
-      });
-    }
+    // if (phone) {
+    //   console.log("Phone Check");
+    //   UserFound = await User.findOne({
+    //     phone: phone,
+    //   });
+    // }
 
     if (UserFound) {
       return res.status(422).json({
@@ -189,15 +189,15 @@ router.post("/register-web", async (req, res) => {
     const user = new User({
       name,
       email,
-      phone,
-      password,
-      address,
-      country,
-      city,
-      state,
-      pincode,
       type,
       profileImg,
+      password,
+      // phone,
+      // address,
+      // country,
+      // city,
+      // state,
+      // pincode,
     });
 
     // Save the user to the database
@@ -1166,7 +1166,7 @@ router.post("/add-dog-review/:dogId", userAuth, async (req, res) => {
     const averageRating = totalRatings / dog.ratings.length;
 
     // Update the dog's average rating
-    dog.averageRating = averageRating? averageRating : 0;
+    dog.averageRating = averageRating ? averageRating : 0;
 
     // Save the dog document with the new review and average rating
     await dog.save();
@@ -1551,7 +1551,6 @@ router.get("/get-past-puppies", userAuth, async (req, res) => {
     return res.status(500).json({ error: "Server error" });
   }
 });
-
 
 router.get("/logout", userAuth, async (req, res) => {
   try {
