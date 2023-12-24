@@ -143,7 +143,6 @@ router.post("/register-web", async (req, res) => {
     // pincode,
   } = req.body;
 
-
   try {
     // Check if all the other fields are provided
     if (
@@ -626,6 +625,11 @@ router.post("/add-dog", userAuth, async (req, res) => {
       generic_name,
       age,
       gender,
+      color,
+      dob,
+      availableDate,
+      momWeight,
+      dadWeight,
       disability,
       address,
       comments,
@@ -639,6 +643,9 @@ router.post("/add-dog", userAuth, async (req, res) => {
       !generic_name ||
       !age ||
       !gender ||
+      !color ||
+      !dob ||
+      !availableDate ||
       disability == undefined ||
       disability == null ||
       !address ||
@@ -674,8 +681,12 @@ router.post("/add-dog", userAuth, async (req, res) => {
       breed: breed_id,
       user: user_id,
       generic_name,
+      type: "puppy",
       age,
       gender: gender.toLowerCase(),
+      color,
+      availableDate,
+      DOB: dob,
       disability,
       address,
       comments,
@@ -683,6 +694,9 @@ router.post("/add-dog", userAuth, async (req, res) => {
       name,
       images,
     });
+
+    newDog.mother.weight = momWeight;
+    newDog.father.weight = dadWeight;
 
     await newDog.save();
     return res.status(201).json({ newDog: newDog, success: true });

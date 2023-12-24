@@ -24,6 +24,7 @@ const dogSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User", // Replace 'User' with the actual model name for the user schema
   },
+  type: String,
   generic_name: String,
   age: String,
   DOB: String,
@@ -31,6 +32,7 @@ const dogSchema = new mongoose.Schema({
   gender: String,
   disability: Boolean,
   address: String,
+  availableDate: String,
   comments: String,
   price: Number,
   active: {
