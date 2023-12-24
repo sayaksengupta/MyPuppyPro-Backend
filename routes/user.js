@@ -695,8 +695,8 @@ router.post("/add-dog", userAuth, async (req, res) => {
       images,
     });
 
-    newDog.mother.weight = momWeight;
-    newDog.father.weight = dadWeight;
+    newDog.pedigree.mother.weight = momWeight;
+    newDog.pedigree.father.weight = dadWeight;
 
     await newDog.save();
     return res.status(201).json({ newDog: newDog, success: true });
