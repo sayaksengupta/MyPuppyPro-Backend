@@ -20,6 +20,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
+  kennel: String,
   type: String,
   email: {
     type: String,
