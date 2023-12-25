@@ -370,7 +370,8 @@ router.patch("/update-user", userAuth, async (req, res) => {
     "profileImg",
     "coverImg",
     "pincode",
-    "kennel"
+    "kennel",
+    "about",
   ];
   const isValidOperation = Object.keys(updates).every((update) =>
     allowedUpdates.includes(update)
@@ -414,6 +415,7 @@ router.patch("/update-user", userAuth, async (req, res) => {
         type: user.type,
         profileImg: user.profileImg,
         coverImg: user.coverImg,
+        about: user.about,
       },
     });
   } catch (error) {

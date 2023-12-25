@@ -21,6 +21,7 @@ const userSchema = new mongoose.Schema({
     trim: true,
   },
   kennel: String,
+  about: String,
   type: String,
   email: {
     type: String,
