@@ -830,12 +830,17 @@ router.put("/edit-dog/:id", userAuth, async (req, res) => {
       generic_name,
       age,
       gender,
+      color,
+      dob,
+      availableDate,
+      momWeight,
+      dadWeight,
       disability,
       address,
       comments,
       price,
       name,
-      image,
+      images,
     } = req.body;
 
     // Check if the user exists
@@ -872,7 +877,12 @@ router.put("/edit-dog/:id", userAuth, async (req, res) => {
     if (comments) updatedDog.comments = comments;
     if (price) updatedDog.price = price;
     if (name) updatedDog.name = name;
-    if (image) updatedDog.image = image;
+    if (images) updatedDog.images = images;
+    if (momWeight) updatedDog.momWeight = momWeight;
+    if (dadWeight) updatedDog.dadWeight = dadWeight;
+    if(color) updatedDog.color = color;
+    if(dob) updatedDog.DOB = dob;
+    if(availableDate) updatedDog.availableDate = availableDate;
 
     const UpdatedDoggo = await Dog.findByIdAndUpdate(id, updatedDog, {
       new: true,
