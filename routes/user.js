@@ -868,6 +868,7 @@ router.put("/edit-dog/:id", userAuth, async (req, res) => {
       }
       updatedDog.breed = breed_id;
     }
+
     if (generic_name) updatedDog.generic_name = generic_name;
     if (age) updatedDog.age = age;
     if (gender) updatedDog.gender = gender.toLowerCase();
@@ -878,22 +879,28 @@ router.put("/edit-dog/:id", userAuth, async (req, res) => {
     if (price) updatedDog.price = price;
     if (name) updatedDog.name = name;
     if (images) updatedDog.images = images;
-    if (momWeight) updatedDog.pedigree.mother.weight = momWeight;
-    if (dadWeight) updatedDog.pedigree.father.weight = dadWeight;
-    if(color) updatedDog.color = color;
-    if(dob) updatedDog.DOB = dob;
-    if(availableDate) updatedDog.availableDate = availableDate;
+    if (color) updatedDog.color = color;
+    if (dob) updatedDog.DOB = dob;
+    if (availableDate) updatedDog.availableDate = availableDate;
 
-    const UpdatedDoggo = await Dog.findByIdAndUpdate(id, updatedDog, {
-      new: true,
-    });
+    const UpdatedDoggo = await Dog.findByIdAndUpdate(
+      id,
+      {
+        ...updatedDog,
+        "pedigree.mother.weight": momWeight,
+        "pedigree.father.weight": dadWeight,
+      },
+      {
+        new: true,
+      }
+    );
     return res.status(200).json({
       message: "Dog updated successfully",
       newDog: UpdatedDoggo,
       success: true,
     });
   } catch (error) {
-    console.error("Error editing a dog:", error);
+    console.log(error);
     return res.status(500).json({
       message: "An error occurred while editing the dog",
       success: false,
