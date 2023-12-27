@@ -641,6 +641,7 @@ router.post("/add-dog", userAuth, async (req, res) => {
       price,
       name,
       images,
+      type
     } = req.body;
 
     if (
@@ -656,6 +657,7 @@ router.post("/add-dog", userAuth, async (req, res) => {
       !address ||
       !price ||
       !name ||
+      !type ||
       images.length == 0
     ) {
       return res
@@ -686,7 +688,7 @@ router.post("/add-dog", userAuth, async (req, res) => {
       breed: breed_id,
       user: user_id,
       generic_name,
-      type: "puppy",
+      type,
       age,
       gender: gender.toLowerCase(),
       color,
