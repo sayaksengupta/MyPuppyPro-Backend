@@ -641,7 +641,7 @@ router.post("/add-dog", userAuth, async (req, res) => {
       price,
       name,
       images,
-      type
+      type,
     } = req.body;
 
     if (
@@ -1327,6 +1327,7 @@ router.get("/filter-dogs", async (req, res) => {
       generic_name,
       age,
       gender,
+      location,
       disability,
       minPrice,
       maxPrice,
@@ -1355,6 +1356,11 @@ router.get("/filter-dogs", async (req, res) => {
     if (age) {
       filter.age = { $gte: age };
     }
+
+    if (location) {
+      filter.address = { $regex: new RegExp(location, "i") };
+    }
+
     if (disability !== undefined) {
       filter.disability = disability === "true";
     }
