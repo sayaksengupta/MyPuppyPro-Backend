@@ -15,87 +15,90 @@ const reviewSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const dogSchema = new mongoose.Schema({
-  breed: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Breed", // Replace 'Breed' with the actual model name for the breed schema
-  },
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User", // Replace 'User' with the actual model name for the user schema
-  },
-  type: String,
-  generic_name: String,
-  age: String,
-  DOB: String,
-  color: String,
-  weight: Number,
-  gender: String,
-  disability: Boolean,
-  address: String,
-  availableDate: String,
-  comments: String,
-  price: Number,
-  active: {
-    type: Boolean,
-    default: false,
-  },
-  soldStatus: {
-    type: Boolean,
-    default: false,
-  },
-  pedigree: {
-    father: {
-      breed: String,
-      DOB: String,
-      weight: Number,
-      image: String,
+const dogSchema = new mongoose.Schema(
+  {
+    breed: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Breed", // Replace 'Breed' with the actual model name for the breed schema
     },
-    mother: {
-      breed: String,
-      DOB: String,
-      weight: Number,
-      image: String,
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User", // Replace 'User' with the actual model name for the user schema
     },
-    fratFather: {
-      breed: String,
-      DOB: String,
-      weight: Number,
-      image: String,
-    },
-    fratMother: {
-      breed: String,
-      DOB: String,
-      weight: Number,
-      image: String,
-    },
-    matFather: {
-      breed: String,
-      DOB: String,
-      weight: Number,
-      image: String,
-    },
-    matMother: {
-      breed: String,
-      DOB: String,
-      weight: Number,
-      image: String,
-    },
-  },
-  name: {
     type: String,
-    trim: true,
-  },
-  averageRating: Number,
-  ratings: [
-    {
-      userId: mongoose.Types.ObjectId,
-      rating: Number,
+    generic_name: String,
+    age: String,
+    DOB: String,
+    color: String,
+    weight: Number,
+    gender: String,
+    disability: Boolean,
+    address: String,
+    availableDate: String,
+    comments: String,
+    price: Number,
+    active: {
+      type: Boolean,
+      default: false,
     },
-  ],
-  reviews: [reviewSchema],
-  images: [String],
-});
+    soldStatus: {
+      type: Boolean,
+      default: false,
+    },
+    pedigree: {
+      father: {
+        breed: String,
+        DOB: String,
+        weight: Number,
+        image: String,
+      },
+      mother: {
+        breed: String,
+        DOB: String,
+        weight: Number,
+        image: String,
+      },
+      fratFather: {
+        breed: String,
+        DOB: String,
+        weight: Number,
+        image: String,
+      },
+      fratMother: {
+        breed: String,
+        DOB: String,
+        weight: Number,
+        image: String,
+      },
+      matFather: {
+        breed: String,
+        DOB: String,
+        weight: Number,
+        image: String,
+      },
+      matMother: {
+        breed: String,
+        DOB: String,
+        weight: Number,
+        image: String,
+      },
+    },
+    name: {
+      type: String,
+      trim: true,
+    },
+    averageRating: Number,
+    ratings: [
+      {
+        userId: mongoose.Types.ObjectId,
+        rating: Number,
+      },
+    ],
+    reviews: [reviewSchema],
+    images: [String],
+  },
+  { timestamps: true }
+);
 
 const Dog = mongoose.model("DOGS", dogSchema);
 module.exports = Dog;

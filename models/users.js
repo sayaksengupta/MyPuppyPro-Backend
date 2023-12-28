@@ -15,76 +15,79 @@ const reviewSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    trim: true,
-  },
-  kennel: String,
-  about: String,
-  type: String,
-  email: {
-    type: String,
-    trim: true,
-  },
-  password: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  address: {
-    line1: String,
-    line2: String,
-  },
-  phone: {
-    type: String,
-  },
-  country: String,
-  city: String,
-  state: String,
-  pincode: String,
-  ratings: [
-    {
-      userId: mongoose.Types.ObjectId,
-      rating: Number,
+const userSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      trim: true,
     },
-  ],
-  reviews: [reviewSchema],
-  averageRating: {
-    type: Number,
-    default: 0,
-  },
-  otp: {
-    type: Number,
-  },
-  liked_dogs: [
-    {
-      type: mongoose.Types.ObjectId,
-      ref: "DOGS",
+    kennel: String,
+    about: String,
+    type: String,
+    email: {
+      type: String,
+      trim: true,
     },
-  ],
-  profileImg: {
-    type: String,
-  },
-  coverImg: {
-    type: String,
-  },
-  preferences: [
-    {
-      name: String,
-      breed: {
-        type: mongoose.Types.ObjectId,
-        ref: "Breed",
+    password: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    address: {
+      line1: String,
+      line2: String,
+    },
+    phone: {
+      type: String,
+    },
+    country: String,
+    city: String,
+    state: String,
+    pincode: String,
+    ratings: [
+      {
+        userId: mongoose.Types.ObjectId,
+        rating: Number,
       },
-      image: String,
+    ],
+    reviews: [reviewSchema],
+    averageRating: {
+      type: Number,
+      default: 0,
     },
-  ],
-  pastPuppies: [String],
-  active: {
-    type: Boolean,
-    default: false,
+    otp: {
+      type: Number,
+    },
+    liked_dogs: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "DOGS",
+      },
+    ],
+    profileImg: {
+      type: String,
+    },
+    coverImg: {
+      type: String,
+    },
+    preferences: [
+      {
+        name: String,
+        breed: {
+          type: mongoose.Types.ObjectId,
+          ref: "Breed",
+        },
+        image: String,
+      },
+    ],
+    pastPuppies: [String],
+    active: {
+      type: Boolean,
+      default: false,
+    },
   },
-});
+  { timestamps: true }
+);
 
 // Hashing Passwords
 
