@@ -136,11 +136,11 @@ router.post("/register-web", async (req, res) => {
     password,
     type,
     profileImg,
-    // address,
-    // country,
-    // city,
-    // state,
-    // pincode,
+    address,
+    country,
+    city,
+    state,
+    pincode,
   } = req.body;
 
   try {
@@ -148,9 +148,9 @@ router.post("/register-web", async (req, res) => {
     if (
       !name ||
       !password ||
-      // !address ||
-      // !country ||
-      // !city ||
+      !address ||
+      !country ||
+      !city ||
       !email ||
       !type
     ) {
@@ -191,12 +191,12 @@ router.post("/register-web", async (req, res) => {
       type,
       profileImg,
       password,
-      // phone,
-      // address,
-      // country,
-      // city,
-      // state,
-      // pincode,
+      phone,
+      address,
+      country,
+      city,
+      state,
+      pincode,
     });
 
     // Save the user to the database
