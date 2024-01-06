@@ -191,7 +191,7 @@ router.post("/register-web", async (req, res) => {
       type,
       profileImg,
       password,
-      phone,
+      // phone,
       address,
       country,
       city,
