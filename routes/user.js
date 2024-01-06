@@ -1354,7 +1354,11 @@ router.get("/filter-dogs", async (req, res) => {
       filter.generic_name = generic_name;
     }
     if (age) {
-      filter.age = { $gte: age };
+      if (parseInt(age) <= 16) {
+        filter.age = { $lte: age };
+      }else{
+        filter.age = { $gte: age };
+      }
     }
 
     if (location) {
