@@ -301,18 +301,15 @@ router.post("/login", async (req, res) => {
 router.post("/login-web", async (req, res) => {
   try {
     const logEmail = req.body.email;
-    const logPhone = req.body.phone;
     const logPass = req.body.password;
 
-    if ((!logEmail && !logPhone) || !logPass) {
+    if (!logEmail || !logPass) {
       return res
         .status(422)
         .json({ message: "Please fill all the fields.", success: false });
     }
 
-    const user = await User.findOne({
-      $or: [{ email: logEmail }, { phone: logPhone }],
-    });
+    const user = await User.findOne({ email: logEmail });
 
     if (user) {
       const passCheck = await bcrypt.compare(logPass, user.password);
