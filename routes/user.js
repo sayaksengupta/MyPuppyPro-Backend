@@ -278,6 +278,7 @@ router.post("/login", async (req, res) => {
             pincode: userByEmail.pincode,
             profileImg: userByEmail.profileImg,
             type: userByEmail.type,
+            likedDogs: user.liked_dogs
           },
           otp: otp,
         });
@@ -331,6 +332,7 @@ router.post("/login-web", async (req, res) => {
             pincode: user.pincode,
             profileImg: user.profileImg,
             type: user.type,
+            likedDogs: user.liked_dogs
           },
         });
       } else {
