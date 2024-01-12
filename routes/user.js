@@ -278,7 +278,7 @@ router.post("/login", async (req, res) => {
             pincode: userByEmail.pincode,
             profileImg: userByEmail.profileImg,
             type: userByEmail.type,
-            likedDogs: userByEmail.liked_dogs
+            likedDogs: userByEmail.liked_dogs,
           },
           otp: otp,
         });
@@ -332,7 +332,7 @@ router.post("/login-web", async (req, res) => {
             pincode: user.pincode,
             profileImg: user.profileImg,
             type: user.type,
-            likedDogs: user.liked_dogs
+            likedDogs: user.liked_dogs,
           },
         });
       } else {
@@ -1431,6 +1431,8 @@ router.get("/find-dogs", async (req, res) => {
       filter.price = { $lte: maxPrice };
     }
 
+    filter.type = "puppy";
+
     // Calculate the skip value to implement pagination
     const skip = (page - 1) * limit;
 
@@ -1484,7 +1486,7 @@ router.get("/get-dogs", async (req, res) => {
     const totalDogs = await Dog.countDocuments();
     const totalPages = Math.ceil(totalDogs / limit);
 
-    const dogs = await Dog.find({type: "puppy"}).skip(skip).limit(limit);
+    const dogs = await Dog.find().skip(skip).limit(limit);
 
     // Return the paginated results along with page information as JSON
     res.json({
