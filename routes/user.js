@@ -278,7 +278,7 @@ router.post("/login", async (req, res) => {
             pincode: userByEmail.pincode,
             profileImg: userByEmail.profileImg,
             type: userByEmail.type,
-            likedDogs: user.liked_dogs
+            likedDogs: userByEmail.liked_dogs
           },
           otp: otp,
         });
@@ -650,11 +650,9 @@ router.post("/add-dog", userAuth, async (req, res) => {
       !gender ||
       !color ||
       !dob ||
-      !availableDate ||
       disability == undefined ||
       disability == null ||
       !address ||
-      !price ||
       !name ||
       !type ||
       images.length == 0
