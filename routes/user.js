@@ -1374,7 +1374,7 @@ router.get("/filter-dogs", async (req, res) => {
     } else if (maxPrice) {
       filter.price = { $lte: maxPrice };
     }
-
+    filter.type = "puppy";
     // Query the database
     const filteredDogs = await Dog.find(filter);
 
@@ -1486,7 +1486,7 @@ router.get("/get-dogs", async (req, res) => {
     const totalDogs = await Dog.countDocuments();
     const totalPages = Math.ceil(totalDogs / limit);
 
-    const dogs = await Dog.find({type: "puppy"}).skip(skip).limit(limit);
+    const dogs = await Dog.find({ type: "puppy" }).skip(skip).limit(limit);
 
     // Return the paginated results along with page information as JSON
     res.json({
