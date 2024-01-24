@@ -80,7 +80,12 @@ const userSchema = new mongoose.Schema(
         image: String,
       },
     ],
-    pastPuppies: [String],
+    pastPuppies: [
+      {
+        image: String,
+        description: String,
+      },
+    ],
     active: {
       type: Boolean,
       default: false,

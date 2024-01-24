@@ -1369,11 +1369,14 @@ router.get("/filter-dogs", async (req, res) => {
     }
     if (minPrice && maxPrice) {
       filter.price = { $gte: minPrice, $lte: maxPrice };
-    } else if (minPrice) {
+    } else if (minPrice && minPrice < 30000) {
       filter.price = { $gte: minPrice };
-    } else if (maxPrice) {
+    } else if (maxPrice && maxPrice < 30000) {
       filter.price = { $lte: maxPrice };
+    } else if (minPrice && maxPrice == 30000) {
+      filter.price = { $gte: 30000 };
     }
+
     filter.type = "puppy";
     // Query the database
     const filteredDogs = await Dog.find(filter);
@@ -1564,10 +1567,12 @@ router.post("/add-preferences", userAuth, async (req, res) => {
 router.post("/add-past-puppy", userAuth, async (req, res) => {
   try {
     const user = req.rootUser;
-    const image = req.body.image; // You should include this in the request body
+    const { image, description } = req.body;
 
     if (!image) {
-      return res.status(400).json({ error: "Past puppy name is required" });
+      return res
+        .status(400)
+        .json({ error: "Image is required for the past puppy" });
     }
 
     if (!user) {
@@ -1575,7 +1580,10 @@ router.post("/add-past-puppy", userAuth, async (req, res) => {
     }
 
     // Add the past puppy to the user's document
-    user.pastPuppies.push(image);
+    user.pastPuppies.push({
+      image,
+      description: description ? description : "",
+    });
     await user.save();
 
     return res.status(200).json({ message: "Past puppy added successfully" });
