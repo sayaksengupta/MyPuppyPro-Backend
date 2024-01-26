@@ -720,8 +720,8 @@ router.post("/add-pedigree/:dogId", userAuth, async (req, res) => {
     const { pedigreeDetails } = req.body;
 
     const allowedPedigreeFields = [
-      "DOB",
-      "weight",
+      "name",
+      // "weight",
       "father",
       "mother",
       "fratFather",
