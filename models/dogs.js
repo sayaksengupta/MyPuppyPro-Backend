@@ -50,31 +50,37 @@ const dogSchema = new mongoose.Schema(
         breed: String,
         name: String,
         image: String,
+        weight: Number,
       },
       mother: {
         breed: String,
         name: String,
         image: String,
+        weight: Number,
       },
       fratFather: {
         breed: String,
         name: String,
         image: String,
+        weight: Number,
       },
       fratMother: {
         breed: String,
         name: String,
         image: String,
+        weight: Number,
       },
       matFather: {
         breed: String,
         name: String,
         image: String,
+        weight: Number,
       },
       matMother: {
         breed: String,
         name: String,
         image: String,
+        weight: Number,
       },
     },
     name: {
