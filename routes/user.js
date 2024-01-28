@@ -501,7 +501,27 @@ router.get("/get-user", userAuth, async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    res.json(user);
+    res.status(200).json({
+      _id: user._id,
+      address: user.address,
+      name: user.name,
+      kennel: user.kennel ? user.kennel : "",
+      profileImg: user.profileImg ? user.profileImg : "",
+      coverImg: user.coverImg ? user.coverImg : "",
+      type: user.type,
+      email: user.email,
+      phone: user.phone,
+      country: user.country,
+      city: user.city,
+      state: user.state,
+      pincode: user.pincode,
+      averageRating: 0,
+      liked_dogs: user.liked_dogs,
+      ratings: user.ratings,
+      reviews: user.reviews,
+      preferences: user.preferences,
+      pastPuppies: user.pastPuppies,
+    });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
   }
@@ -515,7 +535,27 @@ router.get("/get-user/:id", async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    res.json(user);
+    res.status(200).json({
+      _id: user._id,
+      address: user.address,
+      name: user.name,
+      kennel: user.kennel ? user.kennel : "",
+      profileImg: user.profileImg ? user.profileImg : "",
+      coverImg: user.coverImg ? user.coverImg : "",
+      type: user.type,
+      email: user.email,
+      phone: user.phone,
+      country: user.country,
+      city: user.city,
+      state: user.state,
+      pincode: user.pincode,
+      averageRating: 0,
+      liked_dogs: user.liked_dogs,
+      ratings: user.ratings,
+      reviews: user.reviews,
+      preferences: user.preferences,
+      pastPuppies: user.pastPuppies,
+    });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
   }
