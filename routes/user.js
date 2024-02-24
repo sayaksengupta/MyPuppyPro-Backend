@@ -47,6 +47,14 @@ router.post("/register", async (req, res) => {
         success: false,
       });
     }
+
+    if(password.length < 8){
+      return res.status(400).json({
+        message: "Password should be of atleast 8 characters",
+        success: false,
+      });
+    }
+    
     let UserFound;
 
     if (email) {
