@@ -628,6 +628,23 @@ router.post("/update-settings", async (req, res) => {
   }
 });
 
+router.get("/get-settings", async (req, res) => {
+  try{
+    const settings = await Setting.findOne({});
+
+    return res.status(200).json({
+      message: "Fetched General Setttings",
+      success: true,
+      settings: settings
+    })
+  }catch (error) {
+    res.status(500).json({
+      message: `Internal server error --> ${error}`,
+      success: false,
+    });
+  }
+})
+
 // Delete State
 router.delete("/delete-state/:stateId", adminAuth, async (req, res) => {
   try {
