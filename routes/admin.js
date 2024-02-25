@@ -609,10 +609,9 @@ router.get("/get-all-states", async (req, res) => {
   }
 });
 
-router.post("/update-settings", async (req, res) => {
+router.post("/update-settings", adminAuth, async (req, res) => {
   try {
     const { breederPlan, puppyListing } = req.body;
-
     const updatedSettings = await Setting.findOneAndUpdate(
       {},
       { breederPlan, puppyListing },
