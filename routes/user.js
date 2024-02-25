@@ -545,6 +545,8 @@ router.get("/get-user", userAuth, async (req, res) => {
       reviews: user.reviews,
       preferences: user.preferences,
       pastPuppies: user.pastPuppies,
+      expiresAt: user.expiresAt,
+      isPro: user.isPro,
     });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
