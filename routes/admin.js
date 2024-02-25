@@ -8,6 +8,7 @@ const Category = require("../models/categories");
 const Breed = require("../models/breeds");
 const Dog = require("../models/dogs");
 const State = require("../models/states");
+const Setting = require("../models/settings");
 
 router.get("/", (req, res) => {
   res.json({ message: "This is the admin api" });
@@ -600,6 +601,25 @@ router.get("/get-all-states", async (req, res) => {
       states: allStates,
       success: true,
     });
+  } catch (error) {
+    res.status(500).json({
+      message: `Internal server error --> ${error}`,
+      success: false,
+    });
+  }
+});
+
+router.post("/update-settings", async (req, res) => {
+  try {
+    const { breederPlan, puppyListing } = req.body;
+
+    const updatedSettings = await Setting.findOneAndUpdate(
+      {},
+      { breederPlan, puppyListing },
+      { new: true }
+    );
+
+    return res.status(200).json({ message: "Settings Updated", success: true });
   } catch (error) {
     res.status(500).json({
       message: `Internal server error --> ${error}`,
