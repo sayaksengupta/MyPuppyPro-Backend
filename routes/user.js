@@ -707,6 +707,7 @@ router.post("/add-dog", userAuth, async (req, res) => {
       name,
       images,
       type,
+      txnId,
     } = req.body;
 
     if (
@@ -726,6 +727,13 @@ router.post("/add-dog", userAuth, async (req, res) => {
       return res
         .status(422)
         .json({ message: "Please fill all the fields !", success: false });
+    }
+
+    if (type == "puppy" && !txnId) {
+      return res.status(400).json({
+        message: "Please complete the payment before listing a puppy",
+        success: false,
+      });
     }
 
     // Check if the user_id exists, you can add your own logic here
