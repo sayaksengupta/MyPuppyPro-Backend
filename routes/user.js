@@ -48,13 +48,13 @@ router.post("/register", async (req, res) => {
       });
     }
 
-    if(password.length < 8){
+    if (password.length < 8) {
       return res.status(400).json({
         message: "Password should be of atleast 8 characters",
         success: false,
       });
     }
-    
+
     let UserFound;
 
     if (email) {
@@ -1655,6 +1655,33 @@ router.get("/get-past-puppies", userAuth, async (req, res) => {
     console.error(error);
     return res.status(500).json({ error: "Server error" });
   }
+});
+
+// PRO --->
+
+router.post("/buy-pro", async (req, res) => {
+  const { userId, txnId } = req.body;
+  if (!userId || !txnId) {
+    return res
+      .status(422)
+      .json({ message: "Failed to buy pro", success: false });
+  }
+
+  const expirationDate = new Date();
+  const proUser = await User.findByIdAndUpdate(
+    userId,
+    {
+      isPro: true,
+      expiresAt: expirationDate.setFullYear(expirationDate.getFullYear() + 1),
+    },
+    { new: true }
+  );
+
+  return res.status(200).json({
+    message: "Subscribed to Pro Successfully!",
+    success: true,
+    user: proUser,
+  });
 });
 
 router.get("/logout", userAuth, async (req, res) => {

@@ -16,6 +16,7 @@ const connection = require("./db/conn");
 const AWS = require("aws-sdk");
 const multer = require("multer");
 const multerS3 = require("multer-s3");
+const cron = require("node-cron");
 
 let s3 = new AWS.S3({
   region: "us-east-1",
@@ -25,17 +26,18 @@ let s3 = new AWS.S3({
 
 connection();
 
-// s3.createBucket(
-//   {
-//     Bucket: "my-puppy-pro",
-//   },
-//   (error, success) => {
-//     if (error) {
-//       console.log(error);
-//     }
-//     console.log(success);
-//   }
-// );
+cron.schedule("0 0 * * *", async () => {
+  try {
+    const currentDate = new Date();
+    await User.updateMany(
+      { "expiresAt": { $lte: currentDate } },
+      { $set: { isPro: false } }
+    );
+    console.log("Expired plans removed successfully.");
+  } catch (error) {
+    console.error("Error removing expired plans:", error);
+  }
+});
 
 const upload = multer({
   storage: multerS3({

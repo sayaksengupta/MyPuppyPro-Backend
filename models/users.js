@@ -24,6 +24,11 @@ const userSchema = new mongoose.Schema(
     kennel: String,
     about: String,
     type: String,
+    expiresAt: Date,
+    isPro: {
+      type: Boolean,
+      default: false,
+    },
     email: {
       type: String,
       trim: true,
