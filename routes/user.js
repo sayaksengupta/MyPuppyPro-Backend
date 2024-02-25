@@ -149,6 +149,7 @@ router.post("/register-web", async (req, res) => {
     city,
     state,
     pincode,
+    txnId,
   } = req.body;
 
   try {
@@ -165,6 +166,13 @@ router.post("/register-web", async (req, res) => {
       return res
         .status(400)
         .json({ message: "Please provide all the required fields" });
+    }
+
+    if (type == "breeder" && !txnId) {
+      return res.status(400).json({
+        message: "Complete the payment to register as a breeder",
+        success: false,
+      });
     }
 
     let UserFound;
@@ -193,7 +201,7 @@ router.post("/register-web", async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000);
 
     // Create a new user
-    const user = new User({
+    let user = new User({
       name,
       email,
       type,
@@ -206,6 +214,14 @@ router.post("/register-web", async (req, res) => {
       state,
       pincode,
     });
+
+    if (type == "breeder" && txnId) {
+      const expirationDate = new Date();
+      user.isPro = true;
+      user.expiresAt = expirationDate.setFullYear(
+        expirationDate.getFullYear() + 1
+      );
+    }
 
     // Save the user to the database
     const registered = await user.save();
