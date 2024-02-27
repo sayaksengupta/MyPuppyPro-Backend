@@ -93,7 +93,7 @@ const userSchema = new mongoose.Schema(
     ],
     maleImage: String,
     femaleImage: String,
-    availablePuppyImage: string,
+    availablePuppyImage: String,
     pastPuppyImage: String,
     active: {
       type: Boolean,
