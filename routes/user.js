@@ -402,6 +402,10 @@ router.patch("/update-user", userAuth, async (req, res) => {
     "pincode",
     "kennel",
     "about",
+    "maleImage",
+    "femaleImage",
+    "availablePuppyImage",
+    "pastPuppyImage",
   ];
   const isValidOperation = Object.keys(updates).every((update) =>
     allowedUpdates.includes(update)
@@ -446,6 +450,10 @@ router.patch("/update-user", userAuth, async (req, res) => {
         profileImg: user.profileImg,
         coverImg: user.coverImg,
         about: user.about,
+        maleImage: user.maleImage,
+        femaleImage: user.femaleImage,
+        availablePuppyImage: user.availablePuppyImage,
+        pastPuppyImage: user.pastPuppyImage
       },
     });
   } catch (error) {
@@ -554,6 +562,10 @@ router.get("/get-user", userAuth, async (req, res) => {
       pastPuppies: user.pastPuppies,
       expiresAt: user.expiresAt,
       isPro: user.isPro,
+      maleImage: user.maleImage,
+      femaleImage: user.femaleImage,
+      availablePuppyImage: user.availablePuppyImage,
+      pastPuppyImage: user.pastPuppyImage
     });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
@@ -588,6 +600,10 @@ router.get("/get-user/:id", async (req, res) => {
       reviews: user.reviews,
       preferences: user.preferences,
       pastPuppies: user.pastPuppies,
+      maleImage: user.maleImage,
+      femaleImage: user.femaleImage,
+      availablePuppyImage: user.availablePuppyImage,
+      pastPuppyImage: user.pastPuppyImage
     });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });

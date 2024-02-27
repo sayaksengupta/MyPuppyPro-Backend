@@ -91,6 +91,10 @@ const userSchema = new mongoose.Schema(
         description: String,
       },
     ],
+    maleImage: String,
+    femaleImage: String,
+    availablePuppyImage: string,
+    pastPuppyImage: String,
     active: {
       type: Boolean,
       default: false,
