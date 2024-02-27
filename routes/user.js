@@ -184,6 +184,13 @@ router.post("/register-web", async (req, res) => {
       });
     }
 
+    if (password.length < 8) {
+      return res.status(400).json({
+        message: "Password should be of atleast 8 characters",
+        success: false,
+      });
+    }
+
     // if (phone) {
     //   console.log("Phone Check");
     //   UserFound = await User.findOne({
