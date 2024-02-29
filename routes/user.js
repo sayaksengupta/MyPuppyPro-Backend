@@ -27,6 +27,7 @@ router.post("/register", async (req, res) => {
     state,
     pincode,
     profileImg,
+    txnId,
   } = req.body;
 
   let { email, phone } = req.body;
@@ -51,6 +52,13 @@ router.post("/register", async (req, res) => {
     if (password.length < 8) {
       return res.status(400).json({
         message: "Password should be of atleast 8 characters",
+        success: false,
+      });
+    }
+
+    if (type == "breeder" && !txnId) {
+      return res.status(400).json({
+        message: "Complete the payment to register as a breeder",
         success: false,
       });
     }
