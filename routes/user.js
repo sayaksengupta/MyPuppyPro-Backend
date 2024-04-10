@@ -1436,7 +1436,13 @@ router.get("/filter-dogs", async (req, res) => {
       maxAge,
     } = req.query;
 
-    let breedNames = req.body.breedNames.split(",");
+    let breedNames = req.query.breedNames;
+
+    if (breedNames) {
+      breedNames = breedNames.split(",");
+    }
+
+    console.log(breedNames);
     // Fetch the breed and user documents by name
     const [breeds, user] = await Promise.all([
       Breed.find({ name: { $in: breedNames } }),
@@ -1445,9 +1451,9 @@ router.get("/filter-dogs", async (req, res) => {
 
     // Build the filter object
     const filter = {};
-    if (breeds.length > 0) {
-      filter.breed = breeds.map((breed) => breed._id);
-    }
+    // if (breeds.length > 0) {
+    //   filter.breed = breeds.map((breed) => breed._id);
+    // }
     if (user) {
       filter.user = user._id;
     }
@@ -1492,6 +1498,10 @@ router.get("/filter-dogs", async (req, res) => {
     }
 
     filter.type = "puppy";
+
+    if (breedNames.length > 0) {
+      filter.generic_name = { $in: breedNames };
+    }
 
     console.log(filter);
     // Query the database
