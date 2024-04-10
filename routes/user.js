@@ -461,7 +461,7 @@ router.patch("/update-user", userAuth, async (req, res) => {
         maleImage: user.maleImage,
         femaleImage: user.femaleImage,
         availablePuppyImage: user.availablePuppyImage,
-        pastPuppyImage: user.pastPuppyImage
+        pastPuppyImage: user.pastPuppyImage,
       },
     });
   } catch (error) {
@@ -573,7 +573,7 @@ router.get("/get-user", userAuth, async (req, res) => {
       maleImage: user.maleImage,
       femaleImage: user.femaleImage,
       availablePuppyImage: user.availablePuppyImage,
-      pastPuppyImage: user.pastPuppyImage
+      pastPuppyImage: user.pastPuppyImage,
     });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
@@ -611,7 +611,7 @@ router.get("/get-user/:id", async (req, res) => {
       maleImage: user.maleImage,
       femaleImage: user.femaleImage,
       availablePuppyImage: user.availablePuppyImage,
-      pastPuppyImage: user.pastPuppyImage
+      pastPuppyImage: user.pastPuppyImage,
     });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
@@ -1424,7 +1424,6 @@ router.get("/filter-dogs", async (req, res) => {
   try {
     // Parse query parameters
     const {
-      breedName,
       userName,
       generic_name,
       age,
@@ -1433,18 +1432,21 @@ router.get("/filter-dogs", async (req, res) => {
       disability,
       minPrice,
       maxPrice,
+      minAge,
+      maxAge,
     } = req.query;
 
+    let breedNames = req.body.breedNames.split(",");
     // Fetch the breed and user documents by name
-    const [breed, user] = await Promise.all([
-      Breed.findOne({ name: breedName }),
+    const [breeds, user] = await Promise.all([
+      Breed.find({ name: { $in: breedNames } }),
       User.findOne({ name: userName }),
     ]);
 
     // Build the filter object
     const filter = {};
-    if (breed) {
-      filter.breed = breed._id;
+    if (breeds.length > 0) {
+      filter.breed = breeds.map((breed) => breed._id);
     }
     if (user) {
       filter.user = user._id;
@@ -1460,7 +1462,6 @@ router.get("/filter-dogs", async (req, res) => {
       if (Age <= 16) {
         filter.age = { $lte: Age };
       } else {
-        console.log(Age);
         filter.age = { $gt: Age };
       }
     }
@@ -1482,7 +1483,17 @@ router.get("/filter-dogs", async (req, res) => {
       filter.price = { $gte: 30000 };
     }
 
+    if (minAge && maxAge) {
+      filter.age = { $gte: minAge, $lte: maxAge };
+    } else if (minAge && maxAge == 24) {
+      filter.age = { $gte: 24 };
+    } else if (minAge && maxAge <= 1) {
+      filter.price = { $lte: maxAge };
+    }
+
     filter.type = "puppy";
+
+    console.log(filter);
     // Query the database
     const filteredDogs = await Dog.find(filter);
 
