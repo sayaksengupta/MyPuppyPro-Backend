@@ -1499,7 +1499,7 @@ router.get("/filter-dogs", async (req, res) => {
 
     filter.type = "puppy";
 
-    if (breedNames.length > 0) {
+    if (breedNames && breedNames.length > 0) {
       filter.generic_name = { $in: breedNames };
     }
 
