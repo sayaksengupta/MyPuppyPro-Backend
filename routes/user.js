@@ -1491,8 +1491,8 @@ router.get("/filter-dogs", async (req, res) => {
 
     if (minAge && maxAge) {
       filter.age = { $gte: minAge, $lte: maxAge };
-    } else if (minAge && maxAge == 24) {
-      filter.age = { $gte: 24 };
+    } else if (minAge && maxAge == 72) {
+      filter.age = { $gte: 72 };
     } else if (minAge && maxAge <= 1) {
       filter.price = { $lte: maxAge };
     }
