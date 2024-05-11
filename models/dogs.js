@@ -36,6 +36,7 @@ const dogSchema = new mongoose.Schema(
     address: String,
     availableDate: String,
     comments: String,
+    bredType: String,
     price: Number,
     active: {
       type: Boolean,

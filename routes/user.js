@@ -739,6 +739,7 @@ router.post("/add-dog", userAuth, async (req, res) => {
       images,
       type,
       txnId,
+      bredType
     } = req.body;
 
     if (
@@ -753,6 +754,7 @@ router.post("/add-dog", userAuth, async (req, res) => {
       !address ||
       !name ||
       !type ||
+      !bredType ||
       images.length == 0
     ) {
       return res
@@ -802,6 +804,7 @@ router.post("/add-dog", userAuth, async (req, res) => {
       price,
       name,
       images,
+      bredType
     });
 
     newDog.pedigree.mother.weight = momWeight;
@@ -1434,6 +1437,7 @@ router.get("/filter-dogs", async (req, res) => {
       maxPrice,
       minAge,
       maxAge,
+      bredType
     } = req.query;
 
     let breedNames = req.query.breedNames;
@@ -1462,6 +1466,10 @@ router.get("/filter-dogs", async (req, res) => {
     }
     if (generic_name) {
       filter.generic_name = generic_name;
+    }
+
+    if (bredType) {
+      filter.bredType = bredType;
     }
 
     if (location) {
