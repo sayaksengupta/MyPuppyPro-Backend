@@ -739,7 +739,7 @@ router.post("/add-dog", userAuth, async (req, res) => {
       images,
       type,
       txnId,
-      bredType
+      bredType,
     } = req.body;
 
     if (
@@ -804,7 +804,7 @@ router.post("/add-dog", userAuth, async (req, res) => {
       price,
       name,
       images,
-      bredType
+      bredType,
     });
 
     newDog.pedigree.mother.weight = momWeight;
@@ -1437,7 +1437,7 @@ router.get("/filter-dogs", async (req, res) => {
       maxPrice,
       minAge,
       maxAge,
-      bredType
+      bredType,
     } = req.query;
 
     let breedNames = req.query.breedNames;
@@ -1469,7 +1469,12 @@ router.get("/filter-dogs", async (req, res) => {
     }
 
     if (bredType) {
-      filter.bredType = bredType;
+      if (bredType === "purebred_designer") {
+        // Modify the filter to include dogs with 'purebred' or 'designer' in bredType
+        filter.bredType = { $in: ["purebred", "designer"] };
+      } else {
+        filter.bredType = bredType;
+      }
     }
 
     if (location) {
@@ -1507,7 +1512,7 @@ router.get("/filter-dogs", async (req, res) => {
           (currentDate - dobDate) / (7 * 24 * 60 * 60 * 1000)
         );
 
-        console.log(`${dog.name}, ${dog.DOB}, ${ageInWeeks}`)
+        console.log(`${dog.name}, ${dog.DOB}, ${ageInWeeks}`);
         // Check if the age falls within the given criteria
         if (minAge && maxAge) {
           return ageInWeeks >= minAge && ageInWeeks <= maxAge;
