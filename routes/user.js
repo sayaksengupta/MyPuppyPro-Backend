@@ -1426,7 +1426,6 @@ router.get("/filter-dogs", async (req, res) => {
     const {
       userName,
       generic_name,
-      age,
       gender,
       location,
       disability,
@@ -1451,9 +1450,7 @@ router.get("/filter-dogs", async (req, res) => {
 
     // Build the filter object
     const filter = {};
-    // if (breeds.length > 0) {
-    //   filter.breed = breeds.map((breed) => breed._id);
-    // }
+    
     if (user) {
       filter.user = user._id;
     }
@@ -1462,14 +1459,6 @@ router.get("/filter-dogs", async (req, res) => {
     }
     if (generic_name) {
       filter.generic_name = generic_name;
-    }
-    if (age) {
-      let Age = parseInt(age);
-      if (Age <= 16) {
-        filter.age = { $lte: Age };
-      } else {
-        filter.age = { $gt: Age };
-      }
     }
 
     if (location) {
@@ -1489,30 +1478,6 @@ router.get("/filter-dogs", async (req, res) => {
       filter.price = { $gte: 30000 };
     }
 
-    let ageFilteredDogs = [];
-    if (minAge || maxAge) {
-      const dogs = await Dog.find(filter);
-
-      // Filter dogs by age in weeks
-      ageFilteredDogs = dogs.filter((dog) => {
-        const dobDate = new Date(dog.DOB);
-        const currentDate = new Date();
-        const ageInWeeks = Math.floor(
-          (currentDate - dobDate) / (7 * 24 * 60 * 60 * 1000)
-        );
-
-        console.log(`${dog.name}, ${dog.DOB}, ${ageInWeeks}`);
-        // Check if the age falls within the given criteria
-        if (minAge && maxAge) {
-          return ageInWeeks >= minAge && ageInWeeks <= maxAge;
-        } else if (minAge && maxAge == 72) {
-          return ageInWeeks >= 72;
-        } else if (minAge && maxAge <= 1) {
-          return ageInWeeks <= maxAge;
-        }
-      });
-    }
-
     filter.type = "puppy";
 
     if (breedNames && breedNames.length > 0) {
@@ -1521,20 +1486,23 @@ router.get("/filter-dogs", async (req, res) => {
 
     console.log(filter);
     // Query the database
-    let filteredDogs = await Dog.find(filter);
+    const dogs = await Dog.find(filter);
 
-    console.log("AGE FILTERED", ageFilteredDogs);
-
-    // Concatenate the arrays and remove duplicates
-    filteredDogs = [
-      ...filteredDogs,
-      ...ageFilteredDogs.filter(
-        (dog) =>
-          !filteredDogs.find(
-            (filteredDog) => filteredDog._id.toString() === dog._id.toString()
-          )
-      ),
-    ];
+    // Filter dogs by age in weeks
+    const filteredDogs = dogs.filter(dog => {
+      const dobDate = new Date(dog.dob);
+      const currentDate = new Date();
+      const ageInWeeks = Math.floor((currentDate - dobDate) / (7 * 24 * 60 * 60 * 1000));
+      // Check if the age falls within the given criteria
+      if (minAge && maxAge) {
+        return ageInWeeks >= minAge && ageInWeeks <= maxAge;
+      } else if (minAge && maxAge == 72) {
+        return ageInWeeks >= 72;
+      } else if (minAge && maxAge <= 1) {
+        return ageInWeeks <= maxAge;
+      }
+      return true; // Return true if no age criteria specified
+    });
 
     // Return the filtered results as JSON
     res.status(200).json({
@@ -1547,6 +1515,7 @@ router.get("/filter-dogs", async (req, res) => {
     res.status(500).json({ message: "Internal server error", success: false });
   }
 });
+
 
 router.get("/find-dogs", async (req, res) => {
   try {
