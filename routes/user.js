@@ -1501,7 +1501,7 @@ router.get("/filter-dogs", async (req, res) => {
           (currentDate - dobDate) / (7 * 24 * 60 * 60 * 1000)
         );
 
-        console.log(`${dog.name}, ${dog.DOB}, ${ageInWeeks}`)
+        console.log(`${dog.name}, ${dog.DOB}, ${ageInWeeks}`);
         // Check if the age falls within the given criteria
         if (minAge && maxAge) {
           return ageInWeeks >= minAge && ageInWeeks <= maxAge;
@@ -1523,9 +1523,18 @@ router.get("/filter-dogs", async (req, res) => {
     // Query the database
     let filteredDogs = await Dog.find(filter);
 
-    console.log("AGE FILTERED", ageFilteredDogs)
+    console.log("AGE FILTERED", ageFilteredDogs);
 
-    filteredDogs = [...filteredDogs, ageFilteredDogs]
+    // Concatenate the arrays and remove duplicates
+    filteredDogs = [
+      ...filteredDogs,
+      ...ageFilteredDogs.filter(
+        (dog) =>
+          !filteredDogs.find(
+            (filteredDog) => filteredDog._id.toString() === dog._id.toString()
+          )
+      ),
+    ];
 
     // Return the filtered results as JSON
     res.status(200).json({
