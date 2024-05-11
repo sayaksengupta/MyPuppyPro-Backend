@@ -1525,7 +1525,7 @@ router.get("/filter-dogs", async (req, res) => {
 
     console.log("AGE FILTERED", ageFilteredDogs)
 
-    filteredDogs = new Set([...filteredDogs, ageFilteredDogs])
+    filteredDogs = [...filteredDogs, ageFilteredDogs]
 
     // Return the filtered results as JSON
     res.status(200).json({
