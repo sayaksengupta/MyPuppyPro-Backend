@@ -1495,13 +1495,13 @@ router.get("/filter-dogs", async (req, res) => {
 
       // Filter dogs by age in weeks
       ageFilteredDogs = dogs.filter((dog) => {
-        const dobDate = new Date(dog.dob);
+        const dobDate = new Date(dog.DOB);
         const currentDate = new Date();
         const ageInWeeks = Math.floor(
           (currentDate - dobDate) / (7 * 24 * 60 * 60 * 1000)
         );
 
-        console.log(`${dog.name}, ${dog.dob}, ${ageInWeeks}`)
+        console.log(`${dog.name}, ${dog.DOB}, ${ageInWeeks}`)
         // Check if the age falls within the given criteria
         if (minAge && maxAge) {
           return ageInWeeks >= minAge && ageInWeeks <= maxAge;
