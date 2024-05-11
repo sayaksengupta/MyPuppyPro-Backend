@@ -1426,6 +1426,7 @@ router.get("/filter-dogs", async (req, res) => {
     const {
       userName,
       generic_name,
+      age,
       gender,
       location,
       disability,
@@ -1450,7 +1451,9 @@ router.get("/filter-dogs", async (req, res) => {
 
     // Build the filter object
     const filter = {};
-    
+    // if (breeds.length > 0) {
+    //   filter.breed = breeds.map((breed) => breed._id);
+    // }
     if (user) {
       filter.user = user._id;
     }
@@ -1486,24 +1489,27 @@ router.get("/filter-dogs", async (req, res) => {
 
     console.log(filter);
     // Query the database
-    const dogs = await Dog.find(filter);
+    let filteredDogs = await Dog.find(filter);
 
-    // Filter dogs by age in weeks
-    const filteredDogs = dogs.filter(dog => {
-      const dobDate = new Date(dog.dob);
-      const currentDate = new Date();
-      const ageInWeeks = Math.floor((currentDate - dobDate) / (7 * 24 * 60 * 60 * 1000));
-      // Check if the age falls within the given criteria
-      if (minAge && maxAge) {
-        return ageInWeeks >= minAge && ageInWeeks <= maxAge;
-      } else if (minAge && maxAge == 72) {
-        return ageInWeeks >= 72;
-      } else if (minAge && maxAge <= 1) {
-        return ageInWeeks <= maxAge;
-      }
-      return true; // Return true if no age criteria specified
-    });
+    if (minAge || maxAge) {
+      filteredDogs = filteredDogs.filter((dog) => {
+        const dobDate = new Date(dog.DOB);
+        const currentDate = new Date();
+        const ageInWeeks = Math.floor(
+          (currentDate - dobDate) / (7 * 24 * 60 * 60 * 1000)
+        );
 
+        console.log(`${dog.name}, ${dog.DOB}, ${ageInWeeks}`)
+        // Check if the age falls within the given criteria
+        if (minAge && maxAge) {
+          return ageInWeeks >= minAge && ageInWeeks <= maxAge;
+        } else if (minAge && maxAge == 72) {
+          return ageInWeeks >= 72;
+        } else if (minAge && maxAge <= 1) {
+          return ageInWeeks <= maxAge;
+        }
+      });
+    }
     // Return the filtered results as JSON
     res.status(200).json({
       message: "Dogs fetched successfully!",
@@ -1515,7 +1521,6 @@ router.get("/filter-dogs", async (req, res) => {
     res.status(500).json({ message: "Internal server error", success: false });
   }
 });
-
 
 router.get("/find-dogs", async (req, res) => {
   try {
