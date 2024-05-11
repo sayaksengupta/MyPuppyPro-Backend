@@ -1524,10 +1524,7 @@ router.get("/filter-dogs", async (req, res) => {
     // Query the database
     let filteredDogs = await Dog.find(filter);
 
-    filteredDogs =
-      ageFilteredDogs.length > 0
-        ? filteredDogs.push(ageFilteredDogs)
-        : filteredDogs;
+    filteredDogs = new Set([...filteredDogs, ageFilteredDogs])
 
     // Return the filtered results as JSON
     res.status(200).json({
