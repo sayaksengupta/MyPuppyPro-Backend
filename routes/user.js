@@ -1510,7 +1510,6 @@ router.get("/filter-dogs", async (req, res) => {
         } else if (minAge && maxAge <= 1) {
           return ageInWeeks <= maxAge;
         }
-        return true; // Return true if no age criteria specified
       });
     }
 
@@ -1523,6 +1522,8 @@ router.get("/filter-dogs", async (req, res) => {
     console.log(filter);
     // Query the database
     let filteredDogs = await Dog.find(filter);
+
+    console.log("AGE FILTERED", ageFilteredDogs)
 
     filteredDogs = new Set([...filteredDogs, ageFilteredDogs])
 
