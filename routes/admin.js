@@ -9,6 +9,7 @@ const Breed = require("../models/breeds");
 const Dog = require("../models/dogs");
 const State = require("../models/states");
 const Setting = require("../models/settings");
+const City = require("../models/cities");
 
 router.get("/", (req, res) => {
   res.json({ message: "This is the admin api" });
@@ -577,6 +578,67 @@ router.post("/add-states-bulk", adminAuth, async (req, res) => {
 
       return res.status(200).json({
         message: `${addedStateNames.join(", ")} added successfully!`,
+        success: true,
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: `Internal server error --> ${error}`,
+      success: false,
+    });
+  }
+});
+
+
+router.post("/add-city", adminAuth, async (req, res) => {
+  try {
+    const { city } = req.body;
+
+    if (!city) {
+      return res.status(422).json({
+        message: "Please provide City Name !",
+        success: false,
+      });
+    }
+
+    const cityAdded = await City.create({ name: city.toLowerCase() });
+
+    if (cityAdded) {
+      return res.status(200).json({
+        message: `${cityAdded.name} added successfully !`,
+        success: true,
+      });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: `Internal server error --> ${error}`, success: false });
+  }
+});
+
+router.post("/add-cities-bulk", adminAuth, async (req, res) => {
+  try {
+    const { cities } = req.body;
+
+    if (!cities || !Array.isArray(cities) || cities.length === 0) {
+      return res.status(422).json({
+        message: "Please provide an array of cities to add!",
+        success: false,
+      });
+    }
+
+    // Convert state names to lowercase
+    const citiesToAdd = cities.map((city) => ({
+      name: city.name.toLowerCase(),
+    }));
+
+    const citiesAdded = await City.insertMany(citiesToAdd);
+
+    if (citiesAdded && citiesAdded.length > 0) {
+      const addedCityNames = citiesAdded.map((city) => city.name);
+
+      return res.status(200).json({
+        message: `${addedCityNames.join(", ")} added successfully!`,
         success: true,
       });
     }
