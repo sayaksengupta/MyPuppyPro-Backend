@@ -589,7 +589,6 @@ router.post("/add-states-bulk", adminAuth, async (req, res) => {
   }
 });
 
-
 router.post("/add-city", adminAuth, async (req, res) => {
   try {
     const { city } = req.body;
@@ -671,6 +670,39 @@ router.get("/get-all-states", async (req, res) => {
   }
 });
 
+// Search city route
+router.get("/search-city", async (req, res) => {
+  const searchQuery = req.query.city;
+
+  if (!searchQuery) {
+    return res
+      .status(400)
+      .json({ error: "Query parameter 'city' is required" });
+  }
+
+  try {
+    const matchedCities = await City.find(
+      {
+        name: { $regex: searchQuery, $options: "i" },
+      },
+      { __v: 0, createdAt: 0, updatedAt: 0 }
+    ).limit(10); // Limit to 10 results for better performance
+
+    return res.status(200).json({
+      message: "Cities Fetched !",
+      cities: matchedCities,
+      success: true,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Start the server
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
+
 router.post("/update-settings", adminAuth, async (req, res) => {
   try {
     const { breederPlan, puppyListing } = req.body;
@@ -690,21 +722,21 @@ router.post("/update-settings", adminAuth, async (req, res) => {
 });
 
 router.get("/get-settings", async (req, res) => {
-  try{
+  try {
     const settings = await Setting.findOne({});
 
     return res.status(200).json({
       message: "Fetched General Setttings",
       success: true,
-      settings: settings
-    })
-  }catch (error) {
+      settings: settings,
+    });
+  } catch (error) {
     res.status(500).json({
       message: `Internal server error --> ${error}`,
       success: false,
     });
   }
-})
+});
 
 // Delete State
 router.delete("/delete-state/:stateId", adminAuth, async (req, res) => {
