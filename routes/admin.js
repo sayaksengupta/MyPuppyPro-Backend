@@ -698,10 +698,6 @@ router.get("/search-city", async (req, res) => {
   }
 });
 
-// Start the server
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
 
 router.post("/update-settings", adminAuth, async (req, res) => {
   try {
