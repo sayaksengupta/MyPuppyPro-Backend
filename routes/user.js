@@ -574,6 +574,7 @@ router.get("/get-user", userAuth, async (req, res) => {
       femaleImage: user.femaleImage,
       availablePuppyImage: user.availablePuppyImage,
       pastPuppyImage: user.pastPuppyImage,
+      createdAt: user.createdAt
     });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
@@ -612,6 +613,7 @@ router.get("/get-user/:id", async (req, res) => {
       femaleImage: user.femaleImage,
       availablePuppyImage: user.availablePuppyImage,
       pastPuppyImage: user.pastPuppyImage,
+      createdAt: user.createdAt
     });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
