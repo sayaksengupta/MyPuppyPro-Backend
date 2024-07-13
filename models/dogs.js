@@ -27,6 +27,8 @@ const dogSchema = new mongoose.Schema(
     },
     type: String,
     generic_name: String,
+    state: String,
+    city: String,
     age: Number,
     DOB: String,
     color: String,

@@ -740,6 +740,8 @@ router.post("/add-dog", userAuth, async (req, res) => {
       type,
       txnId,
       bredType,
+      state,
+      city
     } = req.body;
 
     if (
@@ -754,6 +756,8 @@ router.post("/add-dog", userAuth, async (req, res) => {
       !address ||
       !name ||
       !type ||
+      !state ||
+      !city ||
       !bredType ||
       images.length == 0
     ) {
@@ -805,6 +809,8 @@ router.post("/add-dog", userAuth, async (req, res) => {
       name,
       images,
       bredType,
+      state,
+      city
     });
 
     newDog.pedigree.mother.weight = momWeight;
@@ -948,6 +954,8 @@ router.put("/edit-dog/:id", userAuth, async (req, res) => {
       price,
       name,
       images,
+      state,
+      city
     } = req.body;
 
     // Check if the user exists
@@ -989,6 +997,8 @@ router.put("/edit-dog/:id", userAuth, async (req, res) => {
     if (color) updatedDog.color = color;
     if (dob) updatedDog.DOB = dob;
     if (availableDate) updatedDog.availableDate = availableDate;
+    if (state) updatedDog.state = state;
+    if (city) updatedDog.city = city;
 
     const UpdatedDoggo = await Dog.findByIdAndUpdate(
       id,
