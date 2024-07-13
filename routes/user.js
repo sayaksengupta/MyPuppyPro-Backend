@@ -741,7 +741,7 @@ router.post("/add-dog", userAuth, async (req, res) => {
       txnId,
       bredType,
       state,
-      city
+      city,
     } = req.body;
 
     if (
@@ -810,7 +810,7 @@ router.post("/add-dog", userAuth, async (req, res) => {
       images,
       bredType,
       state,
-      city
+      city,
     });
 
     newDog.pedigree.mother.weight = momWeight;
@@ -955,7 +955,7 @@ router.put("/edit-dog/:id", userAuth, async (req, res) => {
       name,
       images,
       state,
-      city
+      city,
     } = req.body;
 
     // Check if the user exists
@@ -1448,6 +1448,7 @@ router.get("/filter-dogs", async (req, res) => {
       minAge,
       maxAge,
       bredType,
+      searchBy,
     } = req.query;
 
     let breedNames = req.query.breedNames;
@@ -1487,8 +1488,16 @@ router.get("/filter-dogs", async (req, res) => {
       }
     }
 
-    if (location) {
-      filter.address = { $regex: new RegExp(location, "i") };
+    // if (location) {
+    //   filter.address = { $regex: new RegExp(location, "i") };
+    // }
+
+    if (location && searchBy == "state") {
+      filter.state = { $regex: new RegExp(location, "i") };
+    }
+
+    if (location && searchBy == "city") {
+      filter.city = { $regex: new RegExp(location, "i") };
     }
 
     if (disability !== undefined) {
