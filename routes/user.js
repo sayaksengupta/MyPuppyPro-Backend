@@ -11,6 +11,7 @@ const Order = require("../models/orders");
 const { default: mongoose } = require("mongoose");
 const shortid = require("shortid");
 const DogReview = require("../models/DogReviews");
+const { sendMail } = require("../tools/sendMail");
 
 router.get("/", (req, res) => {
   res.json({ message: "This is the User api" });
@@ -574,7 +575,7 @@ router.get("/get-user", userAuth, async (req, res) => {
       femaleImage: user.femaleImage,
       availablePuppyImage: user.availablePuppyImage,
       pastPuppyImage: user.pastPuppyImage,
-      createdAt: user.createdAt
+      createdAt: user.createdAt,
     });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
@@ -613,7 +614,7 @@ router.get("/get-user/:id", async (req, res) => {
       femaleImage: user.femaleImage,
       availablePuppyImage: user.availablePuppyImage,
       pastPuppyImage: user.pastPuppyImage,
-      createdAt: user.createdAt
+      createdAt: user.createdAt,
     });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
@@ -1804,6 +1805,36 @@ router.get("/logout", userAuth, async (req, res) => {
     res.status(200).send({ message: "logged out successfully!" });
   } catch (e) {
     res.status(500).send(e);
+  }
+});
+
+router.post("/contact-breeder", async (req, res) => {
+  try {
+    const { puppy, message, fromEmail, toEmail } = req.body;
+
+    if (!fromEmail || !toEmail || !message || !puppy) {
+      return res.status(422).json({
+        message: "Please fill in all the fields!",
+        success: false,
+      });
+    }
+
+    const MailSent = await sendMail(fromEmail, toEmail, message, puppy);
+
+    if (MailSent) {
+      return res.status(200).json({
+        message: "Message Sent to Breeder Successfully!",
+        success: true,
+      });
+    }
+
+    return res.status(400).json({
+      message: "Failed to send message!",
+      success: false,
+    });
+  } catch (e) {
+    console.error(error);
+    return res.status(500).json({ error: "Server error" });
   }
 });
 
