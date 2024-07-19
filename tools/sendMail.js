@@ -9,13 +9,13 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-async function sendMail(from, to, puppy, body) {
+async function sendMail(fromEmail, toEmail, message, puppy) {
   try {
     const info = await transporter.sendMail({
-      from,
-      to,
+      from: fromEmail,
+      to: toEmail,
       subject: `Puppy Enquiry for ${puppy}`,
-      body,
+      body: message,
     });
 
     return info;
