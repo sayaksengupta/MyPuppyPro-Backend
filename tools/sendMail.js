@@ -11,16 +11,20 @@ const transporter = nodemailer.createTransport({
 
 async function sendMail(fromEmail, toEmail, message, puppy) {
   try {
+    // Log the type and content of `message`
+    console.log("Type of message:", typeof message);
+    console.log("Message content:", message);
+
     const info = await transporter.sendMail({
       from: fromEmail,
       to: toEmail,
       subject: `Puppy Enquiry for ${puppy}`,
-      body: message,
+      html: message 
     });
 
     return info;
   } catch (err) {
-    console.error(err);
+    console.error("Error sending mail:", err);
     return false;
   }
 }
