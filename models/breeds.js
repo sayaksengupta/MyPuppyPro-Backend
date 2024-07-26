@@ -10,7 +10,7 @@ const breedSchema = new mongoose.Schema({
   },
   active: {
     type: Boolean,
-    default: false
+    default: true
   },
   image: String
 });
