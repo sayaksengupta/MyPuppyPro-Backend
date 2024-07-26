@@ -377,7 +377,7 @@ router.post("/login-web", async (req, res) => {
             profileImg: user.profileImg,
             type: user.type,
             likedDogs: user.liked_dogs,
-            isPro: userByEmail.isPro
+            isPro: user.isPro
           },
         });
       } else {
