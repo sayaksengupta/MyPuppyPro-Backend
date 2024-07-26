@@ -159,7 +159,7 @@ router.post("/register-web", async (req, res) => {
     state,
     pincode,
     txnId,
-    sellPuppy
+    sellPuppy,
   } = req.body;
 
   try {
@@ -557,6 +557,7 @@ router.get("/get-user", userAuth, async (req, res) => {
       kennel: user.kennel ? user.kennel : "",
       profileImg: user.profileImg ? user.profileImg : "",
       coverImg: user.coverImg ? user.coverImg : "",
+      about: user.about,
       type: user.type,
       email: user.email,
       phone: user.phone,
