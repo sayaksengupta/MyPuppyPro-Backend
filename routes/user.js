@@ -159,6 +159,7 @@ router.post("/register-web", async (req, res) => {
     state,
     pincode,
     txnId,
+    sellPuppy
   } = req.body;
 
   try {
@@ -177,7 +178,7 @@ router.post("/register-web", async (req, res) => {
         .json({ message: "Please provide all the required fields" });
     }
 
-    if (type == "breeder" && !txnId) {
+    if (type == "breeder" && !txnId && !sellPuppy) {
       return res.status(400).json({
         message: "Complete the payment to register as a breeder",
         success: false,
