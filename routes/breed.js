@@ -69,7 +69,7 @@ router.put('/edit-breed/:id', async (req, res) => {
 
 router.get('/get-all-breeds', async (req, res) => {
     try {
-      const breeds = await Breed.find();
+      const breeds = await Breed.find({active: true});
       res.json({ success: true, breeds });
     } catch (error) {
       res.status(500).json({ message: `Internal Server Error --> ${error.message}` });

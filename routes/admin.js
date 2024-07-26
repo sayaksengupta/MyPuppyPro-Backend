@@ -767,4 +767,14 @@ router.delete("/delete-state/:stateId", adminAuth, async (req, res) => {
   }
 });
 
+router.get('/get-all-breeds', async (req, res) => {
+  try {
+    const breeds = await Breed.find();
+    res.json({ success: true, breeds });
+  } catch (error) {
+    res.status(500).json({ message: `Internal Server Error --> ${error.message}` });
+  }
+});
+
+
 module.exports = router;
