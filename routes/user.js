@@ -751,6 +751,7 @@ router.post("/add-dog", userAuth, async (req, res) => {
       bredType,
       state,
       city,
+      sellPuppy
     } = req.body;
 
     if (
@@ -775,7 +776,7 @@ router.post("/add-dog", userAuth, async (req, res) => {
         .json({ message: "Please fill all the fields !", success: false });
     }
 
-    if (type == "puppy" && !txnId) {
+    if (type == "puppy" && !txnId && !sellPuppy) {
       return res.status(400).json({
         message: "Please complete the payment before listing a puppy",
         success: false,
