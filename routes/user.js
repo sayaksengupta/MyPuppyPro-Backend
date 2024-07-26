@@ -137,6 +137,7 @@ router.post("/register", async (req, res) => {
         pincode: registered.pincode,
         profileImg: registered.profileImg,
         type: registered.type.toLowerCase(),
+        isPro: registered.isPro
       },
     });
   } catch (error) {
@@ -159,7 +160,7 @@ router.post("/register-web", async (req, res) => {
     state,
     pincode,
     txnId,
-    sellPuppy,
+    sellPuppy
   } = req.body;
 
   try {
@@ -261,6 +262,7 @@ router.post("/register-web", async (req, res) => {
         pincode: registered.pincode,
         profileImg: registered.profileImg,
         type: registered.type.toLowerCase(),
+        isPro: registered.isPro
       },
     });
   } catch (error) {
@@ -320,6 +322,7 @@ router.post("/login", async (req, res) => {
             profileImg: userByEmail.profileImg,
             type: userByEmail.type,
             likedDogs: userByEmail.liked_dogs,
+            isPro: userByEmail.isPro
           },
           otp: otp,
         });
@@ -374,6 +377,7 @@ router.post("/login-web", async (req, res) => {
             profileImg: user.profileImg,
             type: user.type,
             likedDogs: user.liked_dogs,
+            isPro: userByEmail.isPro
           },
         });
       } else {
