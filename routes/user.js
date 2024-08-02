@@ -775,12 +775,15 @@ router.post("/add-dog", userAuth, async (req, res) => {
         .json({ message: "Please fill all the fields !", success: false });
     }
 
-    if (type == "puppy" && !txnId && !req.rootUser.isPro) {
-      return res.status(400).json({
-        message: "Please complete the payment before listing a puppy",
-        success: false,
-      });
-    }
+    // PAYPAL CHECK DISABLED //
+    
+    // if (type == "puppy" && !txnId && !req.rootUser.isPro) {
+    //   return res.status(400).json({
+    //     message: "Please complete the payment before listing a puppy",
+    //     success: false,
+    //   });
+    // }
+    
 
     // Check if the user_id exists, you can add your own logic here
     // For example, if you have a User model, you can check if the user exists in the database.
