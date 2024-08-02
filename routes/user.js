@@ -1659,7 +1659,7 @@ router.get("/get-dogs", async (req, res) => {
     const totalDogs = await Dog.countDocuments();
     const totalPages = Math.ceil(totalDogs / limit);
 
-    const dogs = await Dog.find({ type: "puppy" }, {createdAt: -1}).skip(skip).limit(limit);
+    const dogs = await Dog.find({ type: "puppy" }).skip(skip).limit(limit).sort({createdAt: -1});
 
     // Return the paginated results along with page information as JSON
     res.json({
