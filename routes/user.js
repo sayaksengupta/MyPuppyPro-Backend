@@ -137,7 +137,7 @@ router.post("/register", async (req, res) => {
         pincode: registered.pincode,
         profileImg: registered.profileImg,
         type: registered.type.toLowerCase(),
-        isPro: registered.isPro
+        isPro: registered.isPro,
       },
     });
   } catch (error) {
@@ -160,7 +160,7 @@ router.post("/register-web", async (req, res) => {
     state,
     pincode,
     txnId,
-    sellPuppy
+    sellPuppy,
   } = req.body;
 
   try {
@@ -262,7 +262,7 @@ router.post("/register-web", async (req, res) => {
         pincode: registered.pincode,
         profileImg: registered.profileImg,
         type: registered.type.toLowerCase(),
-        isPro: registered.isPro
+        isPro: registered.isPro,
       },
     });
   } catch (error) {
@@ -322,7 +322,7 @@ router.post("/login", async (req, res) => {
             profileImg: userByEmail.profileImg,
             type: userByEmail.type,
             likedDogs: userByEmail.liked_dogs,
-            isPro: userByEmail.isPro
+            isPro: userByEmail.isPro,
           },
           otp: otp,
         });
@@ -377,7 +377,7 @@ router.post("/login-web", async (req, res) => {
             profileImg: user.profileImg,
             type: user.type,
             likedDogs: user.liked_dogs,
-            isPro: user.isPro
+            isPro: user.isPro,
           },
         });
       } else {
@@ -776,14 +776,13 @@ router.post("/add-dog", userAuth, async (req, res) => {
     }
 
     // PAYPAL CHECK DISABLED //
-    
+
     // if (type == "puppy" && !txnId && !req.rootUser.isPro) {
     //   return res.status(400).json({
     //     message: "Please complete the payment before listing a puppy",
     //     success: false,
     //   });
     // }
-    
 
     // Check if the user_id exists, you can add your own logic here
     // For example, if you have a User model, you can check if the user exists in the database.
@@ -1613,7 +1612,10 @@ router.get("/find-dogs", async (req, res) => {
     const skip = (page - 1) * limit;
 
     // Query the database based on the filter criteria with pagination
-    const filteredDogs = await Dog.find(filter).skip(skip).limit(limit);
+    const filteredDogs = await Dog.find(filter)
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
     const totalFilteredDogs = await Dog.find(filter).countDocuments();
     const totalPages = Math.ceil(totalFilteredDogs / limit);
 
@@ -1662,7 +1664,10 @@ router.get("/get-dogs", async (req, res) => {
     const totalDogs = await Dog.countDocuments();
     const totalPages = Math.ceil(totalDogs / limit);
 
-    const dogs = await Dog.find({ type: "puppy" }).skip(skip).limit(limit).sort({createdAt: -1});
+    const dogs = await Dog.find({ type: "puppy" })
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
 
     // Return the paginated results along with page information as JSON
     res.json({
